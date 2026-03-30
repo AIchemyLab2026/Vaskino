@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /?staff=*
+
+# Яндекс — разрешить всё
+User-agent: Yandex
+Allow: /
+Crawl-delay: 1
+
+# Google — разрешить всё
+User-agent: Googlebot
+Allow: /
+
+Sitemap: https://vaskino-ksk.ru/sitemap.xml
