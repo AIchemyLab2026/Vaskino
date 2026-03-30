@@ -1,16 +1,21 @@
-// КСК Васькино — Service Worker v1.0
+// КСК Васькино — Service Worker v1.1
 const CACHE = 'vaskino-v1';
-const OFFLINE_ASSETS = ['/Vaskino/', '/Vaskino/index.html', '/Vaskino/manifest.json', '/Vaskino/crest.png'];
+const OFFLINE_ASSETS = [
+  '/Vaskino/',
+  '/Vaskino/index.html',
+  '/Vaskino/manifest.json',
+  '/Vaskino/crest.png'
+];
 
-// Install: cache core assets
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(OFFLINE_ASSETS))
+    caches.open(CACHE).then(cache =>
+      Promise.allSettled(OFFLINE_ASSETS.map(url => cache.add(url)))
+    )
   );
   self.skipWaiting();
 });
 
-// Activate: clean old caches
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
@@ -20,17 +25,13 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// Fetch: network-first with cache fallback
 self.addEventListener('fetch', e => {
-  // Only cache GET requests for same origin
-  if (e.request.method !== 'GET') return;
-  if (!e.request.url.startsWith(self.location.origin)) return;
-
+  if(e.request.method !== 'GET') return;
+  if(!e.request.url.startsWith(self.location.origin)) return;
   e.respondWith(
     fetch(e.request)
       .then(resp => {
-        // Clone and cache successful responses
-        if (resp && resp.status === 200) {
+        if(resp && resp.status === 200) {
           const clone = resp.clone();
           caches.open(CACHE).then(cache => cache.put(e.request, clone));
         }
@@ -40,22 +41,20 @@ self.addEventListener('fetch', e => {
   );
 });
 
-// Push notifications (stub — wire up with web-push server)
 self.addEventListener('push', e => {
   const data = e.data ? e.data.json() : { title: 'КСК Васькино', body: 'Новое уведомление' };
   e.waitUntil(
     self.registration.showNotification(data.title || 'КСК Васькино', {
       body: data.body || '',
-      icon: '/crest.png',
-      badge: '/crest.png',
+      icon: '/Vaskino/crest.png',
+      badge: '/Vaskino/crest.png',
       tag: 'vaskino-booking',
-      vibrate: [200, 100, 200],
-      data: { url: data.url || '/#booking' }
+      data: { url: data.url || '/Vaskino/#booking' }
     })
   );
 });
 
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-  e.waitUntil(clients.openWindow(e.notification.data.url || '/'));
+  e.waitUntil(clients.openWindow(e.notification.data.url || '/Vaskino/'));
 });
