@@ -12,9 +12,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
 
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
 <style>
 :root {
     --g800: #0D2618; --g600: #1A6040; --g100: #C8EDD8; --g50: #E8F5EE;
@@ -50,7 +47,6 @@ header { position: fixed; top: 0; width: 100%; background: var(--g800); color: v
 
 .slot { min-width: 40px; height: 50px; background: var(--g50); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
 .slot:hover { background: var(--g100); }
-.slot.selected { background: var(--gold); color: var(--g800); font-weight: bold; box-shadow: inset 0 0 0 3px var(--gold-dk); }
 .slot.past { opacity: 0.3; pointer-events: none; }
 .slot.booked { background: rgba(184,76,42,0.15); color: var(--red); pointer-events: none; }
 .slot.mine { background: rgba(196,151,58,0.2); border: 2px solid var(--gold); cursor: pointer; }
@@ -79,7 +75,7 @@ footer { background: var(--g800); color: rgba(255,255,255,0.5); text-align: cent
     </a>
     <nav style="display:flex;gap:20px;">
         <a href="#booking" style="color:white;text-decoration:none;font-size:0.9rem;">Запись</a>
-        <a href="#" onclick="openAdmin()" style="color:var(--gold);text-decoration:none;font-size:0.9rem;">Админ</a>
+        <a href="#" id="adminLink" style="color:var(--gold);text-decoration:none;font-size:0.9rem;">Админ</a>
     </nav>
 </header>
 
@@ -97,7 +93,7 @@ footer { background: var(--g800); color: rgba(255,255,255,0.5); text-align: cent
         <div style="display:flex;gap:20px;margin-bottom:20px;flex-wrap:wrap;">
             <div style="flex:1;min-width:200px;">
                 <label style="font-size:0.8rem;text-transform:uppercase;color:#666;">Ваш Email</label>
-                <input type="email" id="userEmail" placeholder="email@example.com" onchange="updateUI()">
+                <input type="email" id="userEmail" placeholder="email@example.com">
             </div>
             <div style="flex:1;min-width:200px;">
                 <label style="font-size:0.8rem;text-transform:uppercase;color:#666;">Ваше Имя</label>
@@ -108,9 +104,9 @@ footer { background: var(--g800); color: rgba(255,255,255,0.5); text-align: cent
         <div class="calendar-header">
             <h3 id="monthLabel" style="margin:0;">Загрузка...</h3>
             <div>
-                <button class="calendar-nav" onclick="changeWeek(-1)">← Неделя</button>
-                <button class="calendar-nav" onclick="changeWeek(0)">Сегодня</button>
-                <button class="calendar-nav" onclick="changeWeek(1)">Неделя →</button>
+                <button class="calendar-nav" id="prevWeek">← Неделя</button>
+                <button class="calendar-nav" id="todayBtn">Сегодня</button>
+                <button class="calendar-nav" id="nextWeek">Неделя →</button>
             </div>
         </div>
 
@@ -137,7 +133,7 @@ footer { background: var(--g800); color: rgba(255,255,255,0.5); text-align: cent
             </optgroup>
         </select>
         <textarea id="notes" placeholder="Комментарий (кличка лошади, телефон...)"></textarea>
-        <button class="btn" onclick="submitBooking()">Подтвердить запись</button>
+        <button class="btn" id="submitBtn">Подтвердить запись</button>
     </div>
 
     <div class="card">
@@ -146,42 +142,39 @@ footer { background: var(--g800); color: rgba(255,255,255,0.5); text-align: cent
     </div>
 </section>
 
-<footer>
-    &copy; 2025 КСК Васькино. Чеховский район.
-</footer>
+<footer>&copy; 2025 КСК Васькино. Чеховский район.</footer>
 
-<script>
-const firebaseConfig = {
+<script type="module">
+import { initializeApp }     from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, deleteDoc,
+         doc, query, where, onSnapshot }
+                              from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const app = initializeApp({
     apiKey:            "REPLACE_API_KEY",
     authDomain:        "vaskino-ksk-f25e3.firebaseapp.com",
     projectId:         "vaskino-ksk-f25e3",
     storageBucket:     "vaskino-ksk-f25e3.appspot.com",
     messagingSenderId: "REPLACE_SENDER_ID",
     appId:             "REPLACE_APP_ID"
-};
-
-let db, bookings = [], selectedSlot = null, currentOffset = 0;
-const TIMES = [];
-for(let h=8; h<=20; h++) { TIMES.push(`${h}:00`); TIMES.push(`${h}:30`); }
-const SERVICES = {
-    rent30:  { name: 'Аренда 30 мин',        group: true },
-    rent60:  { name: 'Аренда 60 мин',        group: true },
-    cord30:  { name: 'Корда 30 мин',         group: false },
-    active30:{ name: 'Активная 30 мин',      group: false }
-};
-
-firebase.initializeApp(firebaseConfig);
-db = firebase.firestore();
-
-db.collection('bookings').where('date', '>=', getToday()).onSnapshot(snap => {
-    bookings = snap.docs.map(d => ({id: d.id, ...d.data()}));
-    renderCalendar();
-    updateUI();
 });
+const db = getFirestore(app);
 
-function getToday() { return new Date().toISOString().split('T')[0]; }
-function getDate(d)  { return d.toISOString().split('T')[0]; }
-function addDays(d, n) { let r = new Date(d); r.setDate(r.getDate()+n); return r; }
+let bookings = [], selectedSlot = null, currentOffset = 0;
+
+const TIMES = [];
+for(let h = 8; h <= 20; h++) { TIMES.push(`${h}:00`); TIMES.push(`${h}:30`); }
+
+const SERVICES = {
+    rent30:   { name: 'Аренда 30 мин',      group: true },
+    rent60:   { name: 'Аренда 60 мин',      group: true },
+    cord30:   { name: 'Корда 30 мин',       group: false },
+    active30: { name: 'Активная 30 мин',    group: false }
+};
+
+function getToday()    { return new Date().toISOString().split('T')[0]; }
+function getDate(d)    { return d.toISOString().split('T')[0]; }
+function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
 
 function getStartOfWeek(d) {
     const day = d.getDay();
@@ -189,19 +182,21 @@ function getStartOfWeek(d) {
     return new Date(d.setDate(diff));
 }
 
-function changeWeek(n) {
-    currentOffset = n === 0 ? 0 : currentOffset + n;
+// realtime listener
+const q = query(collection(db, 'bookings'), where('date', '>=', getToday()));
+onSnapshot(q, snap => {
+    bookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderCalendar();
-}
+    updateUI();
+});
 
 function renderCalendar() {
     const start = getStartOfWeek(addDays(new Date(), currentOffset * 7));
     document.getElementById('monthLabel').innerText =
-        start.toLocaleDateString('ru', {month: 'long', year: 'numeric'});
+        start.toLocaleDateString('ru', { month: 'long', year: 'numeric' });
 
     const grid = document.getElementById('calendarGrid');
     grid.innerHTML = '';
-
     grid.innerHTML += `<div class="grid-header grid-day-label">День</div>`;
     TIMES.forEach(t => grid.innerHTML += `<div class="grid-header">${t}</div>`);
 
@@ -212,42 +207,46 @@ function renderCalendar() {
         const dateStr = getDate(day);
         const isToday = dateStr === getToday();
 
-        let rowHtml = `<div class="grid-cell grid-day-label" style="${isToday ? 'background:rgba(196,151,58,0.1)' : ''}">
-            ${day.toLocaleDateString('ru', {weekday: 'short'})}<br><b>${day.getDate()}</b></div>`;
+        let row = `<div class="grid-cell grid-day-label" style="${isToday ? 'background:rgba(196,151,58,0.1)' : ''}">
+            ${day.toLocaleDateString('ru', { weekday: 'short' })}<br><b>${day.getDate()}</b></div>`;
 
         TIMES.forEach(time => {
             const isPast = dateStr < getToday() ||
-                (dateStr === getToday() && time < new Date().toTimeString().slice(0,5));
-            if(isPast) { rowHtml += `<div class="grid-cell slot past"></div>`; return; }
+                (dateStr === getToday() && time < new Date().toTimeString().slice(0, 5));
+            if(isPast) { row += `<div class="grid-cell slot past"></div>`; return; }
 
-            const cellBookings = bookings.filter(b => b.date === dateStr && b.time === time);
-            const myBooking = cellBookings.find(b => b.email === myEmail);
-
+            const cell = bookings.filter(b => b.date === dateStr && b.time === time);
+            const mine = cell.find(b => b.email === myEmail);
             let isFull = false, count = 0;
-            cellBookings.forEach(b => {
-                if(!SERVICES[b.service]?.group) isFull = true;
-                count++;
-            });
+            cell.forEach(b => { if(!SERVICES[b.service]?.group) isFull = true; count++; });
 
-            if(myBooking) {
-                rowHtml += `<div class="grid-cell slot mine" onclick="cancelBooking('${myBooking.id}')" title="${myBooking.service}">✓</div>`;
+            if(mine) {
+                row += `<div class="grid-cell slot mine" data-cancel="${mine.id}" title="${mine.service}">✓</div>`;
             } else if(isFull || count >= 3) {
-                rowHtml += `<div class="grid-cell slot booked" title="Занято">X</div>`;
+                row += `<div class="grid-cell slot booked">X</div>`;
             } else if(count > 0) {
-                rowHtml += `<div class="grid-cell slot" style="background:rgba(196,151,58,0.1)" onclick="selectSlot('${dateStr}','${time}')">${count}/3</div>`;
+                row += `<div class="grid-cell slot" data-date="${dateStr}" data-time="${time}" style="background:rgba(196,151,58,0.1)">${count}/3</div>`;
             } else {
-                rowHtml += `<div class="grid-cell slot" onclick="selectSlot('${dateStr}','${time}')"></div>`;
+                row += `<div class="grid-cell slot" data-date="${dateStr}" data-time="${time}"></div>`;
             }
         });
-        grid.innerHTML += rowHtml;
+        grid.innerHTML += row;
     }
+
+    // события через делегирование — без onclick в HTML
+    grid.querySelectorAll('.slot[data-date]').forEach(el => {
+        el.addEventListener('click', () => selectSlot(el.dataset.date, el.dataset.time));
+    });
+    grid.querySelectorAll('.slot[data-cancel]').forEach(el => {
+        el.addEventListener('click', () => cancelBooking(el.dataset.cancel));
+    });
 }
 
 function selectSlot(date, time) {
-    selectedSlot = {date, time};
+    selectedSlot = { date, time };
     document.getElementById('formCard').style.display = 'block';
     document.getElementById('selectedTimeLabel').innerText = `${date} в ${time}`;
-    document.getElementById('formCard').scrollIntoView({behavior: 'smooth'});
+    document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
 }
 
 async function submitBooking() {
@@ -255,50 +254,53 @@ async function submitBooking() {
     const name    = document.getElementById('userName').value;
     const service = document.getElementById('serviceType').value;
     const notes   = document.getElementById('notes').value;
-
     if(!email || !name || !service || !selectedSlot) { alert('Заполните все поля'); return; }
-
-    await db.collection('bookings').add({
+    await addDoc(collection(db, 'bookings'), {
         ...selectedSlot, service,
-        email: email.toLowerCase(),
-        client: name, notes,
+        email: email.toLowerCase(), client: name, notes,
         createdAt: new Date()
     });
-
     alert('Запись добавлена!');
     selectedSlot = null;
     document.getElementById('formCard').style.display = 'none';
 }
 
 async function cancelBooking(id) {
-    if(confirm('Отменить запись?')) {
-        await db.collection('bookings').doc(id).delete();
-    }
+    if(confirm('Отменить запись?')) await deleteDoc(doc(db, 'bookings', id));
 }
 
 function updateUI() {
     const email = document.getElementById('userEmail').value.toLowerCase();
     const list  = document.getElementById('myBookings');
     const mine  = bookings.filter(b => b.email === email);
-
-    if(mine.length === 0) list.innerHTML = '<p style="color:#999">Нет активных записей</p>';
-    else list.innerHTML = mine.map(b => `
-        <div class="booking-item">
-            <div><b>${b.date} ${b.time}</b><br>${SERVICES[b.service]?.name || b.service}${b.notes ? ' ('+b.notes+')' : ''}</div>
-            <button class="btn-danger" onclick="cancelBooking('${b.id}')">Отменить</button>
-        </div>`).join('');
+    if(mine.length === 0) {
+        list.innerHTML = '<p style="color:#999">Нет активных записей</p>';
+    } else {
+        list.innerHTML = mine.map(b => `
+            <div class="booking-item">
+                <div><b>${b.date} ${b.time}</b><br>${SERVICES[b.service]?.name || b.service}${b.notes ? ' (' + b.notes + ')' : ''}</div>
+                <button class="btn-danger" data-cancel="${b.id}">Отменить</button>
+            </div>`).join('');
+        list.querySelectorAll('.btn-danger').forEach(btn =>
+            btn.addEventListener('click', () => cancelBooking(btn.dataset.cancel)));
+    }
     renderCalendar();
 }
 
-function openAdmin() {
+// навигация по неделям
+document.getElementById('prevWeek').addEventListener('click', () => { currentOffset--; renderCalendar(); });
+document.getElementById('nextWeek').addEventListener('click', () => { currentOffset++; renderCalendar(); });
+document.getElementById('todayBtn').addEventListener('click', () => { currentOffset = 0; renderCalendar(); });
+document.getElementById('userEmail').addEventListener('change', updateUI);
+document.getElementById('submitBtn').addEventListener('click', submitBooking);
+document.getElementById('adminLink').addEventListener('click', e => {
+    e.preventDefault();
     const pass = prompt('Пароль администратора:');
-    if(pass === 'admin-ksk_2026') {
-        alert('Добро пожаловать, администратор!');
-    }
-}
+    if(pass === 'admin-ksk_2026') alert('Добро пожаловать, администратор!');
+});
 
 if('serviceWorker' in navigator)
-    navigator.serviceWorker.register('./sw.js', {scope: './'}).catch(console.error);
+    navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(console.error);
 </script>
 </body>
 </html>
