@@ -2,7 +2,8 @@
   "name": "КСК Васькино",
   "short_name": "Васькино",
   "description": "Конно-спортивный клуб. Запись на занятия онлайн.",
-  "start_url": "/",
+  "start_url": "/Vaskino/",
+  "scope": "/Vaskino/",
   "display": "standalone",
   "background_color": "#0D2618",
   "theme_color": "#0D2618",
@@ -10,14 +11,13 @@
   "categories": ["sports", "lifestyle"],
   "lang": "ru",
   "icons": [
-    { "src": "crest.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "crest.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/Vaskino/crest.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/Vaskino/crest.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ],
-  "screenshots": [],
   "shortcuts": [
     {
       "name": "Забронировать",
-      "url": "/#booking",
+      "url": "/Vaskino/#booking",
       "description": "Перейти к бронированию"
     }
   ]
