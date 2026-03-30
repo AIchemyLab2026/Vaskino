@@ -8,6 +8,7 @@
 <title>КСК Васькино — Бронирование</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="crest.png">
+<link rel="icon" href="crest.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
 
@@ -297,7 +298,7 @@ function openAdmin() {
 }
 
 if('serviceWorker' in navigator)
-    navigator.serviceWorker.register('./sw.js').catch(console.error);
+    navigator.serviceWorker.register('./sw.js', {scope: './'}).catch(console.error);
 </script>
 </body>
 </html>
