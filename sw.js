@@ -1,6 +1,6 @@
 // КСК Васькино — Service Worker v1.0
 const CACHE = 'vaskino-v1';
-const OFFLINE_ASSETS = ['/', '/index.html', '/manifest.json', '/crest.png'];
+const OFFLINE_ASSETS = ['/Vaskino/', '/Vaskino/index.html', '/Vaskino/manifest.json', '/Vaskino/crest.png'];
 
 // Install: cache core assets
 self.addEventListener('install', e => {
