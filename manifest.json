@@ -12,13 +12,14 @@
   "categories": ["sports", "lifestyle"],
   "lang": "ru",
   "icons": [
+    { "src": "/Vaskino/icon-96.png",  "sizes": "96x96",   "type": "image/png", "purpose": "any" },
     { "src": "/Vaskino/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "/Vaskino/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "/Vaskino/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "screenshots": [
-    { "src": "/Vaskino/icon-512.png", "sizes": "512x512", "type": "image/png", "form_factor": "wide" },
-    { "src": "/Vaskino/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "/Vaskino/screenshot-wide.png",   "sizes": "1280x720", "type": "image/png", "form_factor": "wide" },
+    { "src": "/Vaskino/screenshot-mobile.png", "sizes": "390x844",  "type": "image/png", "form_factor": "narrow" }
   ],
   "shortcuts": [
     {
