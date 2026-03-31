@@ -19,51 +19,39 @@
     --white: #F4FAF5; --red: #B84C2A; --radius: 8px;
 }
 body { font-family: 'Jost', sans-serif; background: var(--white); color: var(--g800); margin: 0; }
-
 header { position: fixed; top: 0; width: 100%; background: var(--g800); color: var(--white); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; box-sizing: border-box; }
 .logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--white); }
 .logo img { width: 40px; }
-
 .hero { height: 100vh; background: linear-gradient(135deg, var(--g800), var(--g600)); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: var(--white); padding: 20px; }
 .hero-crest { width: 140px; mix-blend-mode: screen; margin-bottom: 20px; }
 .hero h1 { font-family: 'Playfair Display', serif; font-size: 4rem; margin: 0; }
 .hero p { font-size: 1.2rem; opacity: 0.8; letter-spacing: 2px; text-transform: uppercase; margin-top: 10px; }
 .btn { background: var(--gold); color: var(--g800); padding: 14px 28px; border: none; border-radius: var(--radius); font-size: 1rem; font-weight: 600; cursor: pointer; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; margin-top: 30px; display: inline-block; transition: 0.2s; }
 .btn:hover { background: var(--gold-lt); transform: translateY(-2px); }
-
 .section { padding: 80px 5%; max-width: 1000px; margin: 0 auto; }
 .section-title { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 30px; text-align: center; }
-
 .card { background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); padding: 25px; margin-bottom: 20px; }
-
 .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
 .calendar-nav { background: none; border: 1px solid var(--g100); padding: 8px 15px; cursor: pointer; border-radius: 4px; font-weight: 600; font-family: 'Jost', sans-serif; }
 .calendar-nav:hover { background: var(--g50); }
-
 .grid-container { display: grid; grid-template-columns: 60px repeat(25, 1fr); overflow-x: auto; border: 1px solid var(--g100); border-radius: 8px; }
 .grid-header, .grid-cell { padding: 10px 5px; text-align: center; border-bottom: 1px solid var(--g100); border-right: 1px solid var(--g100); font-size: 0.8rem; }
 .grid-header { background: var(--g50); font-weight: 600; position: sticky; top: 0; z-index: 2; }
 .grid-day-label { position: sticky; left: 0; background: white; z-index: 3; font-weight: 600; text-align: left; padding-left: 10px; border-right: 2px solid var(--gold); }
-
 .slot { min-width: 40px; height: 50px; background: var(--g50); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
 .slot:hover { background: var(--g100); }
 .slot.past { opacity: 0.3; pointer-events: none; }
 .slot.booked { background: rgba(184,76,42,0.15); color: var(--red); pointer-events: none; }
+.slot.blocked { background: rgba(184,76,42,0.08); color: var(--red); pointer-events: none; font-size: 0.7rem; }
 .slot.mine { background: rgba(196,151,58,0.2); border: 2px solid var(--gold); cursor: pointer; }
-
+.slot.mine-ext { background: rgba(196,151,58,0.1); border: 2px solid var(--gold-dk); pointer-events: none; }
 input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid var(--g100); border-radius: 6px; font-family: 'Jost', sans-serif; font-size: 1rem; box-sizing: border-box; }
 button[type="submit"] { width: 100%; }
-
 .booking-item { border-bottom: 1px solid var(--g100); padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
 .booking-item:last-child { border-bottom: none; }
 .btn-danger { background: rgba(184,76,42,0.1); color: var(--red); border: 1px solid var(--red); padding: 5px 10px; font-size: 0.8rem; cursor: pointer; border-radius: 4px; font-family: 'Jost', sans-serif; }
-
 footer { background: var(--g800); color: rgba(255,255,255,0.5); text-align: center; padding: 40px; font-size: 0.9rem; }
-
-@media (max-width: 768px) {
-    .hero h1 { font-size: 2.5rem; }
-    .grid-container { font-size: 0.7rem; }
-}
+@media (max-width: 768px) { .hero h1 { font-size: 2.5rem; } .grid-container { font-size: 0.7rem; } }
 </style>
 </head>
 <body>
@@ -112,7 +100,7 @@ footer { background: var(--g800); color: rgba(255,255,255,0.5); text-align: cent
 
         <div class="grid-container" id="calendarGrid"></div>
 
-        <div style="margin-top:15px;display:flex;gap:20px;font-size:0.8rem;color:#666;">
+        <div style="margin-top:15px;display:flex;gap:20px;font-size:0.8rem;color:#666;flex-wrap:wrap;">
             <span>⬜ Свободно</span>
             <span style="color:var(--red);">🟥 Занято</span>
             <span style="color:var(--gold);">🟨 Моя запись</span>
@@ -145,18 +133,17 @@ footer { background: var(--g800); color: rgba(255,255,255,0.5); text-align: cent
 <footer>&copy; 2025 КСК Васькино. Чеховский район.</footer>
 
 <script type="module">
-import { initializeApp }     from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, deleteDoc,
-         doc, query, where, onSnapshot }
-                              from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, onSnapshot }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const app = initializeApp({
-    apiKey:            "REPLACE_API_KEY",
+    apiKey:            "AIzaSyASuhqyEqxrgRsQgnHk847tvwTOiEhBOiI",
     authDomain:        "vaskino-ksk-f25e3.firebaseapp.com",
     projectId:         "vaskino-ksk-f25e3",
-    storageBucket:     "vaskino-ksk-f25e3.appspot.com",
-    messagingSenderId: "REPLACE_SENDER_ID",
-    appId:             "REPLACE_APP_ID"
+    storageBucket:     "vaskino-ksk-f25e3.firebasestorage.app",
+    messagingSenderId: "563099619411",
+    appId:             "1:563099619411:web:53b713a949831b3263f6a6"
 });
 const db = getFirestore(app);
 
@@ -166,10 +153,10 @@ const TIMES = [];
 for(let h = 8; h <= 20; h++) { TIMES.push(`${h}:00`); TIMES.push(`${h}:30`); }
 
 const SERVICES = {
-    rent30:   { name: 'Аренда 30 мин',      group: true },
-    rent60:   { name: 'Аренда 60 мин',      group: true },
-    cord30:   { name: 'Корда 30 мин',       group: false },
-    active30: { name: 'Активная 30 мин',    group: false }
+    rent30:   { name: 'Аренда 30 мин',   group: true,  slots: 1 },
+    rent60:   { name: 'Аренда 60 мин',   group: true,  slots: 2 },
+    cord30:   { name: 'Корда 30 мин',    group: false, slots: 1 },
+    active30: { name: 'Активная 30 мин', group: false, slots: 1 }
 };
 
 function getToday()    { return new Date().toISOString().split('T')[0]; }
@@ -182,9 +169,62 @@ function getStartOfWeek(d) {
     return new Date(d.setDate(diff));
 }
 
-// realtime listener
-const q = query(collection(db, 'bookings'), where('date', '>=', getToday()));
-onSnapshot(q, snap => {
+// Возвращает все слоты (time-строки), заблокированные записью b
+function blockedTimes(b) {
+    const svc = SERVICES[b.service];
+    if(!svc) return [b.time];
+    const idx = TIMES.indexOf(b.time);
+    const result = [];
+    for(let i = 0; i < svc.slots; i++) {
+        if(TIMES[idx + i]) result.push(TIMES[idx + i]);
+    }
+    return result;
+}
+
+// Проверяет: занят ли слот (dateStr, time) какой-либо записью (включая "хвосты" 60-мин)
+function slotStatus(dateStr, time, myEmail) {
+    // прямые записи на этот слот
+    const direct = bookings.filter(b => b.date === dateStr && b.time === time);
+    // записи из предыдущего слота, которые накрывают текущий (rent60)
+    const prevIdx = TIMES.indexOf(time) - 1;
+    const prev = prevIdx >= 0
+        ? bookings.filter(b => b.date === dateStr && b.time === TIMES[prevIdx] && (SERVICES[b.service]?.slots || 1) > 1)
+        : [];
+
+    const myDirect = direct.find(b => b.email === myEmail);
+    const myPrev   = prev.find(b => b.email === myEmail);
+
+    // Если это "хвост" моей 60-мин записи
+    if(myPrev) return { type: 'mine-ext', booking: myPrev };
+    // Если это моя прямая запись
+    if(myDirect) return { type: 'mine', booking: myDirect };
+    // Занято чужим хвостом
+    if(prev.length > 0) return { type: 'blocked' };
+
+    // Считаем заполненность прямых записей
+    let isFull = false, count = 0;
+    direct.forEach(b => {
+        if(!SERVICES[b.service]?.group) isFull = true;
+        count++;
+    });
+
+    if(isFull || count >= 3) return { type: 'booked' };
+    if(count > 0) return { type: 'partial', count };
+    return { type: 'free' };
+}
+
+// Проверяет, свободны ли N слотов подряд начиная с time (для rent60)
+function hasConsecutiveFree(dateStr, time, n, myEmail) {
+    const idx = TIMES.indexOf(time);
+    for(let i = 0; i < n; i++) {
+        if(!TIMES[idx + i]) return false;
+        const st = slotStatus(dateStr, TIMES[idx + i], myEmail);
+        if(st.type !== 'free' && st.type !== 'partial') return false;
+    }
+    return true;
+}
+
+onSnapshot(query(collection(db, 'bookings'), where('date', '>=', getToday())), snap => {
     bookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderCalendar();
     updateUI();
@@ -215,17 +255,20 @@ function renderCalendar() {
                 (dateStr === getToday() && time < new Date().toTimeString().slice(0, 5));
             if(isPast) { row += `<div class="grid-cell slot past"></div>`; return; }
 
-            const cell = bookings.filter(b => b.date === dateStr && b.time === time);
-            const mine = cell.find(b => b.email === myEmail);
-            let isFull = false, count = 0;
-            cell.forEach(b => { if(!SERVICES[b.service]?.group) isFull = true; count++; });
+            const st = slotStatus(dateStr, time, myEmail);
 
-            if(mine) {
-                row += `<div class="grid-cell slot mine" data-cancel="${mine.id}" title="${mine.service}">✓</div>`;
-            } else if(isFull || count >= 3) {
+            if(st.type === 'mine') {
+                const svc = SERVICES[st.booking.service];
+                const label = svc?.slots > 1 ? '✓₁' : '✓';
+                row += `<div class="grid-cell slot mine" data-cancel="${st.booking.id}" title="${SERVICES[st.booking.service]?.name || st.booking.service}">${label}</div>`;
+            } else if(st.type === 'mine-ext') {
+                row += `<div class="grid-cell slot mine-ext" title="продолжение 60 мин">✓₂</div>`;
+            } else if(st.type === 'booked') {
                 row += `<div class="grid-cell slot booked">X</div>`;
-            } else if(count > 0) {
-                row += `<div class="grid-cell slot" data-date="${dateStr}" data-time="${time}" style="background:rgba(196,151,58,0.1)">${count}/3</div>`;
+            } else if(st.type === 'blocked') {
+                row += `<div class="grid-cell slot blocked">—</div>`;
+            } else if(st.type === 'partial') {
+                row += `<div class="grid-cell slot" data-date="${dateStr}" data-time="${time}" style="background:rgba(196,151,58,0.1)">${st.count}/3</div>`;
             } else {
                 row += `<div class="grid-cell slot" data-date="${dateStr}" data-time="${time}"></div>`;
             }
@@ -233,7 +276,6 @@ function renderCalendar() {
         grid.innerHTML += row;
     }
 
-    // события через делегирование — без onclick в HTML
     grid.querySelectorAll('.slot[data-date]').forEach(el => {
         el.addEventListener('click', () => selectSlot(el.dataset.date, el.dataset.time));
     });
@@ -254,15 +296,28 @@ async function submitBooking() {
     const name    = document.getElementById('userName').value;
     const service = document.getElementById('serviceType').value;
     const notes   = document.getElementById('notes').value;
+    const myEmail = email.toLowerCase();
+
     if(!email || !name || !service || !selectedSlot) { alert('Заполните все поля'); return; }
+
+    const svc = SERVICES[service];
+
+    // Проверяем что все нужные слоты свободны
+    if(svc.slots > 1 && !hasConsecutiveFree(selectedSlot.date, selectedSlot.time, svc.slots, myEmail)) {
+        alert('Недостаточно свободного времени для 60 минут. Выберите другой слот.');
+        return;
+    }
+
     await addDoc(collection(db, 'bookings'), {
         ...selectedSlot, service,
-        email: email.toLowerCase(), client: name, notes,
+        email: myEmail, client: name, notes,
         createdAt: new Date()
     });
     alert('Запись добавлена!');
     selectedSlot = null;
     document.getElementById('formCard').style.display = 'none';
+    document.getElementById('serviceType').value = '';
+    document.getElementById('notes').value = '';
 }
 
 async function cancelBooking(id) {
@@ -287,7 +342,6 @@ function updateUI() {
     renderCalendar();
 }
 
-// навигация по неделям
 document.getElementById('prevWeek').addEventListener('click', () => { currentOffset--; renderCalendar(); });
 document.getElementById('nextWeek').addEventListener('click', () => { currentOffset++; renderCalendar(); });
 document.getElementById('todayBtn').addEventListener('click', () => { currentOffset = 0; renderCalendar(); });
