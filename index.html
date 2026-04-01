@@ -126,6 +126,12 @@ footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;paddi
         </div>
     </div>
 
+    <!-- Публичные комментарии к слотам -->
+    <div class="card" id="commentsCard" style="display:none">
+        <h3 style="margin-top:0" id="commentsTitle">Записи на этот слот</h3>
+        <div id="commentsList"></div>
+    </div>
+
     <div class="card" id="formCard" style="display:none">
         <h3 style="margin-top:0">Оформление: <span id="selectedTimeLabel"></span></h3>
         <select id="serviceType">
@@ -159,7 +165,7 @@ footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;paddi
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, onSnapshot }
+import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, query, where, onSnapshot }
     from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const app = initializeApp({
@@ -362,11 +368,11 @@ function renderCalendar() {
             } else if(st.type === 'mine-ext') {
                 bodyHtml += `<td><div class="slot mine-ext" title="продолжение">+</div></td>`;
             } else if(st.type === 'booked') {
-                bodyHtml += `<td><div class="slot booked">✕</div></td>`;
+                bodyHtml += `<td><div class="slot booked" data-view="${ds}|${time}">✕</div></td>`;
             } else if(st.type === 'blocked') {
-                bodyHtml += `<td><div class="slot blocked">—</div></td>`;
+                bodyHtml += `<td><div class="slot blocked" data-view="${ds}|${time}">—</div></td>`;
             } else if(st.type === 'partial') {
-                bodyHtml += `<td><div class="slot partial" data-date="${ds}" data-time="${time}">${st.count}/3</div></td>`;
+                bodyHtml += `<td><div class="slot partial" data-date="${ds}" data-time="${time}" data-view="${ds}|${time}">${st.count}/3</div></td>`;
             } else {
                 bodyHtml += `<td><div class="slot free" data-date="${ds}" data-time="${time}"></div></td>`;
             }
@@ -383,6 +389,33 @@ function renderCalendar() {
     body.querySelectorAll('.slot[data-cancel]').forEach(el => {
         el.addEventListener('click', () => cancelBooking(el.dataset.cancel));
     });
+    body.querySelectorAll('.slot[data-view]').forEach(el => {
+        el.addEventListener('click', () => showSlotComments(el.dataset.view));
+    });
+}
+
+// ── Публичные комментарии слота ───────────────────────────────────────────────
+
+function showSlotComments(key) {
+    const [ds, time] = key.split('|');
+    const card = document.getElementById('commentsCard');
+    const title = document.getElementById('commentsTitle');
+    const list  = document.getElementById('commentsList');
+
+    const covering = bookings.filter(b => b.date === ds && occupiedTimes(b).includes(time));
+    if(covering.length === 0) { card.style.display = 'none'; return; }
+
+    title.innerText = `Записи на ${ds} в ${time}`;
+    list.innerHTML = covering.map(b => `
+        <div class="booking-item">
+            <div>
+                <b>${b.client}</b> · ${SERVICES[b.service]?.name || b.service}<br>
+                ${b.notes ? `<span style="color:#555;font-size:.9rem">💬 ${b.notes}</span>` : '<span style="color:#aaa;font-size:.85rem">Комментарий не указан</span>'}
+            </div>
+        </div>`).join('');
+
+    card.style.display = 'block';
+    card.scrollIntoView({ behavior:'smooth' });
 }
 
 // ── Бронирование ─────────────────────────────────────────────────────────────
@@ -475,17 +508,32 @@ function renderAdmin() {
     }
 
     list.innerHTML = sorted.map(b => `
-        <div class="admin-booking">
-            <div>
+        <div class="admin-booking" id="ab-${b.id}">
+            <div style="flex:1">
                 <b>${b.date} ${b.time}</b> · ${SERVICES[b.service]?.name || b.service}<br>
-                <span style="color:#444">${b.client} &lt;${b.email}&gt;</span>
-                ${b.notes ? `<br><span style="color:#666">💬 ${b.notes}</span>` : ''}
+                <span style="color:#444">${b.client} &lt;${b.email}&gt;</span><br>
+                <span style="color:#666;font-size:.85rem">💬 </span>
+                <span id="note-${b.id}" style="color:#555;font-size:.85rem">${b.notes || '—'}</span>
             </div>
-            <button class="btn-danger" data-cancel="${b.id}">Удалить</button>
+            <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
+                <button class="btn-danger" data-cancel="${b.id}">Удалить</button>
+                <button style="background:rgba(13,38,24,.08);border:1px solid var(--g100);padding:5px 10px;font-size:.8rem;cursor:pointer;border-radius:4px;font-family:'Jost',sans-serif" data-edit="${b.id}" data-notes="${(b.notes||'').replace(/"/g,'&quot;')}">✏️ Изменить</button>
+            </div>
         </div>`).join('');
 
     list.querySelectorAll('.btn-danger').forEach(btn =>
         btn.addEventListener('click', () => cancelBooking(btn.dataset.cancel)));
+
+    list.querySelectorAll('[data-edit]').forEach(btn =>
+        btn.addEventListener('click', async () => {
+            const id = btn.dataset.edit;
+            const cur = btn.dataset.notes;
+            const newNote = prompt('Комментарий:', cur);
+            if(newNote === null) return;
+            await updateDoc(doc(db, 'bookings', id), { notes: newNote });
+            document.getElementById(`note-${id}`).innerText = newNote || '—';
+            btn.dataset.notes = newNote;
+        }));
 }
 
 // ── События ───────────────────────────────────────────────────────────────────
