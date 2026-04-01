@@ -11,59 +11,72 @@
 <link rel="icon" href="crest.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
-
 <style>
 :root {
-    --g800: #0D2618; --g600: #1A6040; --g100: #C8EDD8; --g50: #E8F5EE;
-    --gold: #C4973A; --gold-lt: #E8C855; --gold-dk: #8B6814;
-    --white: #F4FAF5; --red: #B84C2A; --radius: 8px;
+    --g800:#0D2618;--g600:#1A6040;--g100:#C8EDD8;--g50:#E8F5EE;
+    --gold:#C4973A;--gold-lt:#E8C855;--gold-dk:#8B6814;
+    --white:#F4FAF5;--red:#B84C2A;--radius:8px;
 }
-body { font-family: 'Jost', sans-serif; background: var(--white); color: var(--g800); margin: 0; }
-header { position: fixed; top: 0; width: 100%; background: var(--g800); color: var(--white); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; box-sizing: border-box; }
-.logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--white); }
-.logo img { width: 40px; }
-.hero { height: 100vh; background: linear-gradient(135deg, var(--g800), var(--g600)); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: var(--white); padding: 20px; }
-.hero-crest { width: 140px; mix-blend-mode: screen; margin-bottom: 20px; }
-.hero h1 { font-family: 'Playfair Display', serif; font-size: 4rem; margin: 0; }
-.hero p { font-size: 1.2rem; opacity: 0.8; letter-spacing: 2px; text-transform: uppercase; margin-top: 10px; }
-.btn { background: var(--gold); color: var(--g800); padding: 14px 28px; border: none; border-radius: var(--radius); font-size: 1rem; font-weight: 600; cursor: pointer; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; margin-top: 30px; display: inline-block; transition: 0.2s; }
-.btn:hover { background: var(--gold-lt); transform: translateY(-2px); }
-.section { padding: 80px 5%; max-width: 1000px; margin: 0 auto; }
-.section-title { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 30px; text-align: center; }
-.card { background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); padding: 25px; margin-bottom: 20px; }
-.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
-.calendar-nav { background: none; border: 1px solid var(--g100); padding: 8px 15px; cursor: pointer; border-radius: 4px; font-weight: 600; font-family: 'Jost', sans-serif; }
-.calendar-nav:hover { background: var(--g50); }
-.grid-container { display: grid; grid-template-columns: 60px repeat(25, 1fr); overflow-x: auto; border: 1px solid var(--g100); border-radius: 8px; }
-.grid-header, .grid-cell { padding: 10px 5px; text-align: center; border-bottom: 1px solid var(--g100); border-right: 1px solid var(--g100); font-size: 0.8rem; }
-.grid-header { background: var(--g50); font-weight: 600; position: sticky; top: 0; z-index: 2; }
-.grid-day-label { position: sticky; left: 0; background: white; z-index: 3; font-weight: 600; text-align: left; padding-left: 10px; border-right: 2px solid var(--gold); }
-.slot { min-width: 40px; height: 50px; background: var(--g50); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-.slot:hover { background: var(--g100); }
-.slot.past { opacity: 0.3; pointer-events: none; }
-.slot.booked { background: rgba(184,76,42,0.15); color: var(--red); pointer-events: none; }
-.slot.blocked { background: rgba(184,76,42,0.08); color: var(--red); pointer-events: none; font-size: 0.7rem; }
-.slot.mine { background: rgba(196,151,58,0.2); border: 2px solid var(--gold); cursor: pointer; }
-.slot.mine-ext { background: rgba(196,151,58,0.1); border: 2px solid var(--gold-dk); pointer-events: none; }
-input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid var(--g100); border-radius: 6px; font-family: 'Jost', sans-serif; font-size: 1rem; box-sizing: border-box; }
-button[type="submit"] { width: 100%; }
-.booking-item { border-bottom: 1px solid var(--g100); padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
-.booking-item:last-child { border-bottom: none; }
-.btn-danger { background: rgba(184,76,42,0.1); color: var(--red); border: 1px solid var(--red); padding: 5px 10px; font-size: 0.8rem; cursor: pointer; border-radius: 4px; font-family: 'Jost', sans-serif; }
-footer { background: var(--g800); color: rgba(255,255,255,0.5); text-align: center; padding: 40px; font-size: 0.9rem; }
-@media (max-width: 768px) { .hero h1 { font-size: 2.5rem; } .grid-container { font-size: 0.7rem; } }
+*{box-sizing:border-box}
+body{font-family:'Jost',sans-serif;background:var(--white);color:var(--g800);margin:0}
+header{position:fixed;top:0;width:100%;background:var(--g800);color:var(--white);padding:15px 5%;display:flex;justify-content:space-between;align-items:center;z-index:1000}
+.logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--white)}
+.logo img{width:40px}
+.hero{height:100vh;background:linear-gradient(135deg,var(--g800),var(--g600));display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;color:var(--white);padding:20px}
+.hero-crest{width:140px;mix-blend-mode:screen;margin-bottom:20px}
+.hero h1{font-family:'Playfair Display',serif;font-size:4rem;margin:0}
+.hero p{font-size:1.2rem;opacity:.8;letter-spacing:2px;text-transform:uppercase;margin-top:10px}
+.btn{background:var(--gold);color:var(--g800);padding:14px 28px;border:none;border-radius:var(--radius);font-size:1rem;font-weight:600;cursor:pointer;text-decoration:none;text-transform:uppercase;letter-spacing:1px;margin-top:30px;display:inline-block;transition:.2s}
+.btn:hover{background:var(--gold-lt);transform:translateY(-2px)}
+.section{padding:80px 5%;max-width:1100px;margin:0 auto}
+.section-title{font-family:'Playfair Display',serif;font-size:2.5rem;margin-bottom:30px;text-align:center}
+.card{background:white;border-radius:12px;box-shadow:0 5px 20px rgba(0,0,0,.05);padding:25px;margin-bottom:20px}
+.cal-nav-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;flex-wrap:wrap;gap:10px}
+.calendar-nav{background:none;border:1px solid var(--g100);padding:8px 15px;cursor:pointer;border-radius:4px;font-weight:600;font-family:'Jost',sans-serif}
+.calendar-nav:hover{background:var(--g50)}
+
+/* Таблица — строгий grid */
+.cal-wrap{overflow-x:auto;border:1px solid var(--g100);border-radius:8px}
+table.cal{border-collapse:collapse;min-width:100%;table-layout:fixed}
+table.cal th,table.cal td{border:1px solid var(--g100);text-align:center;font-size:.75rem;padding:0;white-space:nowrap}
+table.cal thead th{background:var(--g50);font-weight:600;padding:6px 4px;position:sticky;top:0;z-index:2;min-width:44px}
+table.cal thead th.day-col{width:56px;min-width:56px;position:sticky;left:0;z-index:3;background:var(--g50)}
+table.cal tbody td.day-label{position:sticky;left:0;background:white;z-index:1;font-weight:600;padding:4px 6px;border-right:2px solid var(--gold);min-width:56px;width:56px}
+table.cal tbody td.day-label.today{background:rgba(196,151,58,.08)}
+
+.slot{width:100%;height:46px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s;font-size:.75rem}
+.slot:hover{background:var(--g100)}
+.slot.past{background:#f0f0f0;opacity:.4;pointer-events:none}
+.slot.free{background:var(--g50)}
+.slot.booked{background:rgba(184,76,42,.15);color:var(--red);pointer-events:none}
+.slot.blocked{background:rgba(184,76,42,.07);color:var(--red);pointer-events:none;font-size:.65rem}
+.slot.partial{background:rgba(196,151,58,.12);cursor:pointer}
+.slot.mine{background:rgba(196,151,58,.25);border:2px solid var(--gold);cursor:pointer}
+.slot.mine-ext{background:rgba(196,151,58,.1);border:2px dashed var(--gold-dk);pointer-events:none}
+
+input,select,textarea{width:100%;padding:12px;margin-bottom:15px;border:1px solid var(--g100);border-radius:6px;font-family:'Jost',sans-serif;font-size:1rem}
+button[type=submit]{width:100%}
+.booking-item{border-bottom:1px solid var(--g100);padding:10px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.booking-item:last-child{border-bottom:none}
+.btn-danger{background:rgba(184,76,42,.1);color:var(--red);border:1px solid var(--red);padding:5px 10px;font-size:.8rem;cursor:pointer;border-radius:4px;font-family:'Jost',sans-serif;white-space:nowrap}
+footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;padding:40px;font-size:.9rem}
+
+/* Админ-панель */
+#adminPanel{display:none;background:#fffbf0;border:1px solid var(--gold);border-radius:8px;padding:16px;margin-bottom:20px}
+#adminPanel h3{margin-top:0;color:var(--g800)}
+.admin-booking{border-bottom:1px solid var(--g100);padding:8px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;font-size:.85rem}
+.admin-booking:last-child{border-bottom:none}
+
+@media(max-width:768px){.hero h1{font-size:2.5rem}}
 </style>
 </head>
 <body>
 
 <header>
-    <a href="#" class="logo">
-        <img src="crest.png" alt="Logo">
-        <span>КСК Васькино</span>
-    </a>
-    <nav style="display:flex;gap:20px;">
-        <a href="#booking" style="color:white;text-decoration:none;font-size:0.9rem;">Запись</a>
-        <a href="#" id="adminLink" style="color:var(--gold);text-decoration:none;font-size:0.9rem;">Админ</a>
+    <a href="#" class="logo"><img src="crest.png" alt="Logo"><span>КСК Васькино</span></a>
+    <nav style="display:flex;gap:20px">
+        <a href="#booking" style="color:white;text-decoration:none;font-size:.9rem">Запись</a>
+        <a href="#" id="adminLink" style="color:var(--gold);text-decoration:none;font-size:.9rem">Админ</a>
     </nav>
 </header>
 
@@ -78,19 +91,19 @@ footer { background: var(--g800); color: rgba(255,255,255,0.5); text-align: cent
     <h2 class="section-title">Расписание бочки</h2>
 
     <div class="card">
-        <div style="display:flex;gap:20px;margin-bottom:20px;flex-wrap:wrap;">
-            <div style="flex:1;min-width:200px;">
-                <label style="font-size:0.8rem;text-transform:uppercase;color:#666;">Ваш Email</label>
+        <div style="display:flex;gap:20px;margin-bottom:20px;flex-wrap:wrap">
+            <div style="flex:1;min-width:200px">
+                <label style="font-size:.8rem;text-transform:uppercase;color:#666">Ваш Email</label>
                 <input type="email" id="userEmail" placeholder="email@example.com">
             </div>
-            <div style="flex:1;min-width:200px;">
-                <label style="font-size:0.8rem;text-transform:uppercase;color:#666;">Ваше Имя</label>
+            <div style="flex:1;min-width:200px">
+                <label style="font-size:.8rem;text-transform:uppercase;color:#666">Ваше Имя</label>
                 <input type="text" id="userName" placeholder="Иван Петров">
             </div>
         </div>
 
-        <div class="calendar-header">
-            <h3 id="monthLabel" style="margin:0;">Загрузка...</h3>
+        <div class="cal-nav-row">
+            <h3 id="monthLabel" style="margin:0">Загрузка...</h3>
             <div>
                 <button class="calendar-nav" id="prevWeek">← Неделя</button>
                 <button class="calendar-nav" id="todayBtn">Сегодня</button>
@@ -98,35 +111,47 @@ footer { background: var(--g800); color: rgba(255,255,255,0.5); text-align: cent
             </div>
         </div>
 
-        <div class="grid-container" id="calendarGrid"></div>
+        <div class="cal-wrap">
+            <table class="cal" id="calTable">
+                <thead id="calHead"></thead>
+                <tbody id="calBody"></tbody>
+            </table>
+        </div>
 
-        <div style="margin-top:15px;display:flex;gap:20px;font-size:0.8rem;color:#666;flex-wrap:wrap;">
-            <span>⬜ Свободно</span>
-            <span style="color:var(--red);">🟥 Занято</span>
-            <span style="color:var(--gold);">🟨 Моя запись</span>
+        <div style="margin-top:12px;display:flex;gap:16px;font-size:.8rem;color:#666;flex-wrap:wrap">
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;background:var(--g50);border:1px solid var(--g100);display:inline-block"></span>Свободно</span>
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;background:rgba(184,76,42,.15);border:1px solid var(--g100);display:inline-block"></span>Занято</span>
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;background:rgba(196,151,58,.25);border:2px solid var(--gold);display:inline-block"></span>Моя запись</span>
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;background:rgba(196,151,58,.12);border:1px solid var(--g100);display:inline-block"></span>Частично занято</span>
         </div>
     </div>
 
-    <div class="card" id="formCard" style="display:none;">
-        <h3 style="margin-top:0;">Оформление: <span id="selectedTimeLabel"></span></h3>
+    <div class="card" id="formCard" style="display:none">
+        <h3 style="margin-top:0">Оформление: <span id="selectedTimeLabel"></span></h3>
         <select id="serviceType">
             <option value="">Выберите услугу...</option>
-            <optgroup label="Групповые (до 3 чел)">
+            <optgroup label="Групповые (до 3 чел, одновременно)">
                 <option value="rent30">Аренда 30 мин</option>
                 <option value="rent60">Аренда 60 мин</option>
             </optgroup>
-            <optgroup label="Индивидуальные">
+            <optgroup label="Индивидуальные (бочка полностью)">
                 <option value="cord30">Корда 30 мин</option>
                 <option value="active30">Активная лошадь 30 мин</option>
             </optgroup>
         </select>
-        <textarea id="notes" placeholder="Комментарий (кличка лошади, телефон...)"></textarea>
+        <textarea id="notes" rows="3" placeholder="Комментарий (кличка лошади, телефон, пожелания...)"></textarea>
         <button class="btn" id="submitBtn">Подтвердить запись</button>
     </div>
 
+    <!-- Админ-панель -->
+    <div id="adminPanel">
+        <h3>Все записи (администратор)</h3>
+        <div id="adminBookings"></div>
+    </div>
+
     <div class="card">
-        <h3 style="margin-top:0;">Мои записи</h3>
-        <div id="myBookings">Загрузка...</div>
+        <h3 style="margin-top:0">Мои записи</h3>
+        <div id="myBookings"><p style="color:#999">Введите email чтобы увидеть свои записи</p></div>
     </div>
 </section>
 
@@ -147,214 +172,349 @@ const app = initializeApp({
 });
 const db = getFirestore(app);
 
-let bookings = [], selectedSlot = null, currentOffset = 0;
+let bookings = [], selectedSlot = null, currentOffset = 0, isAdmin = false;
 
+// Слоты: каждые 30 минут с 8:00 до 20:30
 const TIMES = [];
-for(let h = 8; h <= 20; h++) { TIMES.push(`${h}:00`); TIMES.push(`${h}:30`); }
+for(let h = 8; h <= 20; h++) {
+    TIMES.push(`${String(h).padStart(2,'0')}:00`);
+    if(h < 20) TIMES.push(`${String(h).padStart(2,'0')}:30`);
+}
+// Добавляем 20:30 явно
+TIMES.push('20:30');
 
 const SERVICES = {
-    rent30:   { name: 'Аренда 30 мин',   group: true,  slots: 1 },
-    rent60:   { name: 'Аренда 60 мин',   group: true,  slots: 2 },
-    cord30:   { name: 'Корда 30 мин',    group: false, slots: 1 },
-    active30: { name: 'Активная 30 мин', group: false, slots: 1 }
+    rent30:   { name:'Аренда 30 мин',   group:true,  slots:1 },
+    rent60:   { name:'Аренда 60 мин',   group:true,  slots:2 },
+    cord30:   { name:'Корда 30 мин',    group:false, slots:1 },
+    active30: { name:'Активная 30 мин', group:false, slots:1 }
 };
 
-function getToday()    { return new Date().toISOString().split('T')[0]; }
-function getDate(d)    { return d.toISOString().split('T')[0]; }
-function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
+// ── Дата-хелперы ─────────────────────────────────────────────────────────────
 
-function getStartOfWeek(d) {
-    const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-    return new Date(d.setDate(diff));
+function todayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-// Возвращает все слоты (time-строки), заблокированные записью b
-function blockedTimes(b) {
-    const svc = SERVICES[b.service];
-    if(!svc) return [b.time];
-    const idx = TIMES.indexOf(b.time);
+function dateStr(d) {
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function addDays(d, n) {
+    const r = new Date(d); r.setDate(r.getDate() + n); return r;
+}
+
+function getMonday(d) {
+    const r = new Date(d);
+    const day = r.getDay();
+    const diff = (day === 0) ? -6 : 1 - day;
+    r.setDate(r.getDate() + diff);
+    return r;
+}
+
+// Текущее время в минутах от полуночи
+function nowMinutes() {
+    const n = new Date();
+    return n.getHours() * 60 + n.getMinutes();
+}
+
+// Время слота в минутах от полуночи
+function timeToMinutes(t) {
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+}
+
+// Прошёл ли слот?
+function isPast(ds, time) {
+    const today = todayStr();
+    if(ds < today) return true;
+    if(ds > today) return false;
+    // сегодня — сравниваем минуты
+    return timeToMinutes(time) < nowMinutes();
+}
+
+// ── Логика занятости ──────────────────────────────────────────────────────────
+
+// Все временны́е слоты, которые занимает запись b (с учётом длительности)
+function occupiedTimes(b) {
+    const slots = SERVICES[b.service]?.slots || 1;
+    const idx   = TIMES.indexOf(b.time);
     const result = [];
-    for(let i = 0; i < svc.slots; i++) {
+    for(let i = 0; i < slots; i++) {
         if(TIMES[idx + i]) result.push(TIMES[idx + i]);
     }
     return result;
 }
 
-// Проверяет: занят ли слот (dateStr, time) какой-либо записью (включая "хвосты" 60-мин)
-function slotStatus(dateStr, time, myEmail) {
-    // прямые записи на этот слот
-    const direct = bookings.filter(b => b.date === dateStr && b.time === time);
-    // записи из предыдущего слота, которые накрывают текущий (rent60)
-    const prevIdx = TIMES.indexOf(time) - 1;
-    const prev = prevIdx >= 0
-        ? bookings.filter(b => b.date === dateStr && b.time === TIMES[prevIdx] && (SERVICES[b.service]?.slots || 1) > 1)
-        : [];
+// Статус ячейки (dateStr, time) для данного пользователя
+function cellStatus(ds, time, myEmail) {
+    // Все записи на этот день
+    const dayBookings = bookings.filter(b => b.date === ds);
 
-    const myDirect = direct.find(b => b.email === myEmail);
-    const myPrev   = prev.find(b => b.email === myEmail);
+    // Какие записи занимают этот слот (возможно, через duration)
+    const covering = dayBookings.filter(b => occupiedTimes(b).includes(time));
 
-    // Если это "хвост" моей 60-мин записи
-    if(myPrev) return { type: 'mine-ext', booking: myPrev };
-    // Если это моя прямая запись
-    if(myDirect) return { type: 'mine', booking: myDirect };
-    // Занято чужим хвостом
-    if(prev.length > 0) return { type: 'blocked' };
+    // Моя запись, которая начинается именно здесь
+    const myDirect = covering.find(b => b.email === myEmail && b.time === time);
+    // Моя запись, которая «накрывает» этот слот (хвост 60 мин)
+    const myExt    = covering.find(b => b.email === myEmail && b.time !== time);
 
-    // Считаем заполненность прямых записей
-    let isFull = false, count = 0;
-    direct.forEach(b => {
-        if(!SERVICES[b.service]?.group) isFull = true;
-        count++;
-    });
+    if(myDirect) return { type:'mine',     booking: myDirect };
+    if(myExt)    return { type:'mine-ext', booking: myExt };
 
-    if(isFull || count >= 3) return { type: 'booked' };
-    if(count > 0) return { type: 'partial', count };
-    return { type: 'free' };
+    // Чужие записи, занимающие слот
+    const others = covering.filter(b => b.email !== myEmail);
+
+    if(others.length === 0) return { type:'free' };
+
+    // Есть ли среди них индивидуальная (блокирует полностью)?
+    const hasIndiv = others.some(b => !SERVICES[b.service]?.group);
+    if(hasIndiv) return { type:'booked' };
+
+    // Все групповые — проверяем заполненность
+    // Слот считается заблокированным если:
+    // - 3 и более групповых
+    // - или пришла 60-мин запись, и текущий слот — её второй (хвост чужой)
+    const isTailOfOther = others.some(b => b.time !== time);
+    if(isTailOfOther) return { type:'blocked' };
+
+    if(others.length >= 3) return { type:'booked' };
+
+    return { type:'partial', count: others.length };
 }
 
-// Проверяет, свободны ли N слотов подряд начиная с time (для rent60)
-function hasConsecutiveFree(dateStr, time, n, myEmail) {
+// Можно ли записаться на (ds, time) с услугой service?
+function canBook(ds, time, service, myEmail) {
+    const svc = SERVICES[service];
+    if(!svc) return false;
     const idx = TIMES.indexOf(time);
-    for(let i = 0; i < n; i++) {
-        if(!TIMES[idx + i]) return false;
-        const st = slotStatus(dateStr, TIMES[idx + i], myEmail);
-        if(st.type !== 'free' && st.type !== 'partial') return false;
+    for(let i = 0; i < svc.slots; i++) {
+        const t = TIMES[idx + i];
+        if(!t) return false; // выходит за пределы расписания
+        const st = cellStatus(ds, t, myEmail);
+        if(svc.group) {
+            // групповая: слот должен быть свободным или частично занятым ТОЛЬКО групповыми
+            if(st.type === 'booked' || st.type === 'blocked' || st.type === 'mine' || st.type === 'mine-ext') return false;
+            // Проверяем что нет индивидуальных в этом слоте
+            const covering = bookings.filter(b => b.date === ds && occupiedTimes(b).includes(t));
+            if(covering.some(b => !SERVICES[b.service]?.group)) return false;
+        } else {
+            // индивидуальная: слот должен быть полностью свободен
+            if(st.type !== 'free') return false;
+        }
     }
     return true;
 }
 
-onSnapshot(query(collection(db, 'bookings'), where('date', '>=', getToday())), snap => {
-    bookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderCalendar();
-    updateUI();
-});
+// ── Firebase ──────────────────────────────────────────────────────────────────
+
+onSnapshot(
+    query(collection(db, 'bookings'), where('date', '>=', todayStr())),
+    snap => {
+        bookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderCalendar();
+        updateMyBookings();
+        if(isAdmin) renderAdmin();
+    }
+);
+
+// ── Рендер календаря ─────────────────────────────────────────────────────────
 
 function renderCalendar() {
-    const start = getStartOfWeek(addDays(new Date(), currentOffset * 7));
+    const monday = getMonday(addDays(new Date(), currentOffset * 7));
     document.getElementById('monthLabel').innerText =
-        start.toLocaleDateString('ru', { month: 'long', year: 'numeric' });
+        monday.toLocaleDateString('ru', { month:'long', year:'numeric' });
 
-    const grid = document.getElementById('calendarGrid');
-    grid.innerHTML = '';
-    grid.innerHTML += `<div class="grid-header grid-day-label">День</div>`;
-    TIMES.forEach(t => grid.innerHTML += `<div class="grid-header">${t}</div>`);
+    const myEmail = document.getElementById('userEmail').value.trim().toLowerCase();
+    const today   = todayStr();
 
-    const myEmail = document.getElementById('userEmail').value.toLowerCase();
+    // Заголовок
+    const head = document.getElementById('calHead');
+    let headHtml = '<tr><th class="day-col">День</th>';
+    TIMES.forEach(t => { headHtml += `<th>${t}</th>`; });
+    headHtml += '</tr>';
+    head.innerHTML = headHtml;
+
+    // Тело
+    const body = document.getElementById('calBody');
+    let bodyHtml = '';
 
     for(let i = 0; i < 7; i++) {
-        const day = addDays(start, i);
-        const dateStr = getDate(day);
-        const isToday = dateStr === getToday();
+        const day = addDays(monday, i);
+        const ds  = dateStr(day);
+        const isToday = ds === today;
+        const dayLabel = day.toLocaleDateString('ru', { weekday:'short' }) + '<br><b>' + day.getDate() + '</b>';
 
-        let row = `<div class="grid-cell grid-day-label" style="${isToday ? 'background:rgba(196,151,58,0.1)' : ''}">
-            ${day.toLocaleDateString('ru', { weekday: 'short' })}<br><b>${day.getDate()}</b></div>`;
+        bodyHtml += `<tr><td class="day-label${isToday ? ' today' : ''}">${dayLabel}</td>`;
 
         TIMES.forEach(time => {
-            const isPast = dateStr < getToday() ||
-                (dateStr === getToday() && time < new Date().toTimeString().slice(0, 5));
-            if(isPast) { row += `<div class="grid-cell slot past"></div>`; return; }
-
-            const st = slotStatus(dateStr, time, myEmail);
+            if(isPast(ds, time)) {
+                bodyHtml += `<td><div class="slot past"></div></td>`;
+                return;
+            }
+            const st = cellStatus(ds, time, myEmail);
 
             if(st.type === 'mine') {
-                const svc = SERVICES[st.booking.service];
-                const label = svc?.slots > 1 ? '✓₁' : '✓';
-                row += `<div class="grid-cell slot mine" data-cancel="${st.booking.id}" title="${SERVICES[st.booking.service]?.name || st.booking.service}">${label}</div>`;
+                const svcName = SERVICES[st.booking.service]?.name || st.booking.service;
+                const hasNote = st.booking.notes ? ` · ${st.booking.notes}` : '';
+                bodyHtml += `<td><div class="slot mine" data-cancel="${st.booking.id}" title="${svcName}${hasNote}">✓</div></td>`;
             } else if(st.type === 'mine-ext') {
-                row += `<div class="grid-cell slot mine-ext" title="продолжение 60 мин">✓₂</div>`;
+                bodyHtml += `<td><div class="slot mine-ext" title="продолжение">+</div></td>`;
             } else if(st.type === 'booked') {
-                row += `<div class="grid-cell slot booked">X</div>`;
+                bodyHtml += `<td><div class="slot booked">✕</div></td>`;
             } else if(st.type === 'blocked') {
-                row += `<div class="grid-cell slot blocked">—</div>`;
+                bodyHtml += `<td><div class="slot blocked">—</div></td>`;
             } else if(st.type === 'partial') {
-                row += `<div class="grid-cell slot" data-date="${dateStr}" data-time="${time}" style="background:rgba(196,151,58,0.1)">${st.count}/3</div>`;
+                bodyHtml += `<td><div class="slot partial" data-date="${ds}" data-time="${time}">${st.count}/3</div></td>`;
             } else {
-                row += `<div class="grid-cell slot" data-date="${dateStr}" data-time="${time}"></div>`;
+                bodyHtml += `<td><div class="slot free" data-date="${ds}" data-time="${time}"></div></td>`;
             }
         });
-        grid.innerHTML += row;
-    }
 
-    grid.querySelectorAll('.slot[data-date]').forEach(el => {
+        bodyHtml += '</tr>';
+    }
+    body.innerHTML = bodyHtml;
+
+    // Навешиваем события
+    body.querySelectorAll('.slot[data-date]').forEach(el => {
         el.addEventListener('click', () => selectSlot(el.dataset.date, el.dataset.time));
     });
-    grid.querySelectorAll('.slot[data-cancel]').forEach(el => {
+    body.querySelectorAll('.slot[data-cancel]').forEach(el => {
         el.addEventListener('click', () => cancelBooking(el.dataset.cancel));
     });
 }
 
-function selectSlot(date, time) {
-    selectedSlot = { date, time };
+// ── Бронирование ─────────────────────────────────────────────────────────────
+
+function selectSlot(ds, time) {
+    selectedSlot = { date: ds, time };
     document.getElementById('formCard').style.display = 'block';
-    document.getElementById('selectedTimeLabel').innerText = `${date} в ${time}`;
-    document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('selectedTimeLabel').innerText = `${ds} в ${time}`;
+    document.getElementById('serviceType').value = '';
+    document.getElementById('notes').value = '';
+    document.getElementById('formCard').scrollIntoView({ behavior:'smooth' });
 }
 
 async function submitBooking() {
-    const email   = document.getElementById('userEmail').value;
-    const name    = document.getElementById('userName').value;
+    const email   = document.getElementById('userEmail').value.trim();
+    const name    = document.getElementById('userName').value.trim();
     const service = document.getElementById('serviceType').value;
-    const notes   = document.getElementById('notes').value;
+    const notes   = document.getElementById('notes').value.trim();
+
+    if(!email || !name) { alert('Введите email и имя'); return; }
+    if(!service)        { alert('Выберите услугу'); return; }
+    if(!selectedSlot)   { alert('Выберите время в календаре'); return; }
+
     const myEmail = email.toLowerCase();
 
-    if(!email || !name || !service || !selectedSlot) { alert('Заполните все поля'); return; }
-
-    const svc = SERVICES[service];
-
-    // Проверяем что все нужные слоты свободны
-    if(svc.slots > 1 && !hasConsecutiveFree(selectedSlot.date, selectedSlot.time, svc.slots, myEmail)) {
-        alert('Недостаточно свободного времени для 60 минут. Выберите другой слот.');
+    if(!canBook(selectedSlot.date, selectedSlot.time, service, myEmail)) {
+        alert('Этот слот недоступен для выбранной услуги. Пожалуйста, выберите другое время.');
         return;
     }
 
     await addDoc(collection(db, 'bookings'), {
-        ...selectedSlot, service,
-        email: myEmail, client: name, notes,
+        date:      selectedSlot.date,
+        time:      selectedSlot.time,
+        service,
+        email:     myEmail,
+        client:    name,
+        notes,
         createdAt: new Date()
     });
+
     alert('Запись добавлена!');
     selectedSlot = null;
     document.getElementById('formCard').style.display = 'none';
-    document.getElementById('serviceType').value = '';
-    document.getElementById('notes').value = '';
 }
 
 async function cancelBooking(id) {
-    if(confirm('Отменить запись?')) await deleteDoc(doc(db, 'bookings', id));
+    if(confirm('Отменить запись?')) {
+        await deleteDoc(doc(db, 'bookings', id));
+    }
 }
 
-function updateUI() {
-    const email = document.getElementById('userEmail').value.toLowerCase();
+// ── Мои записи ───────────────────────────────────────────────────────────────
+
+function updateMyBookings() {
+    const email = document.getElementById('userEmail').value.trim().toLowerCase();
     const list  = document.getElementById('myBookings');
-    const mine  = bookings.filter(b => b.email === email);
+    if(!email) { list.innerHTML = '<p style="color:#999">Введите email чтобы увидеть свои записи</p>'; return; }
+
+    const mine = bookings.filter(b => b.email === email).sort((a,b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+
     if(mine.length === 0) {
         list.innerHTML = '<p style="color:#999">Нет активных записей</p>';
     } else {
         list.innerHTML = mine.map(b => `
             <div class="booking-item">
-                <div><b>${b.date} ${b.time}</b><br>${SERVICES[b.service]?.name || b.service}${b.notes ? ' (' + b.notes + ')' : ''}</div>
+                <div>
+                    <b>${b.date} ${b.time}</b><br>
+                    ${SERVICES[b.service]?.name || b.service}
+                    ${b.notes ? `<br><span style="color:#666;font-size:.85rem">💬 ${b.notes}</span>` : ''}
+                </div>
                 <button class="btn-danger" data-cancel="${b.id}">Отменить</button>
             </div>`).join('');
         list.querySelectorAll('.btn-danger').forEach(btn =>
             btn.addEventListener('click', () => cancelBooking(btn.dataset.cancel)));
     }
-    renderCalendar();
 }
+
+// ── Админ-панель ─────────────────────────────────────────────────────────────
+
+function renderAdmin() {
+    const panel = document.getElementById('adminPanel');
+    const list  = document.getElementById('adminBookings');
+    panel.style.display = 'block';
+
+    const sorted = [...bookings].sort((a,b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+
+    if(sorted.length === 0) {
+        list.innerHTML = '<p style="color:#999">Записей нет</p>';
+        return;
+    }
+
+    list.innerHTML = sorted.map(b => `
+        <div class="admin-booking">
+            <div>
+                <b>${b.date} ${b.time}</b> · ${SERVICES[b.service]?.name || b.service}<br>
+                <span style="color:#444">${b.client} &lt;${b.email}&gt;</span>
+                ${b.notes ? `<br><span style="color:#666">💬 ${b.notes}</span>` : ''}
+            </div>
+            <button class="btn-danger" data-cancel="${b.id}">Удалить</button>
+        </div>`).join('');
+
+    list.querySelectorAll('.btn-danger').forEach(btn =>
+        btn.addEventListener('click', () => cancelBooking(btn.dataset.cancel)));
+}
+
+// ── События ───────────────────────────────────────────────────────────────────
 
 document.getElementById('prevWeek').addEventListener('click', () => { currentOffset--; renderCalendar(); });
 document.getElementById('nextWeek').addEventListener('click', () => { currentOffset++; renderCalendar(); });
 document.getElementById('todayBtn').addEventListener('click', () => { currentOffset = 0; renderCalendar(); });
-document.getElementById('userEmail').addEventListener('change', updateUI);
+
+document.getElementById('userEmail').addEventListener('input', () => {
+    renderCalendar();
+    updateMyBookings();
+});
+
 document.getElementById('submitBtn').addEventListener('click', submitBooking);
+
 document.getElementById('adminLink').addEventListener('click', e => {
     e.preventDefault();
+    if(isAdmin) { isAdmin = false; document.getElementById('adminPanel').style.display = 'none'; return; }
     const pass = prompt('Пароль администратора:');
-    if(pass === 'admin-ksk_2026') alert('Добро пожаловать, администратор!');
+    if(pass === 'admin-ksk_2026') {
+        isAdmin = true;
+        renderAdmin();
+    } else if(pass !== null) {
+        alert('Неверный пароль');
+    }
 });
 
 if('serviceWorker' in navigator)
-    navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(console.error);
+    navigator.serviceWorker.register('./sw.js', { scope:'./' }).catch(console.error);
 </script>
 </body>
 </html>
