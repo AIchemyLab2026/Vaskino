@@ -97,8 +97,8 @@ footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;paddi
                 <input type="email" id="userEmail" placeholder="email@example.com">
             </div>
             <div style="flex:1;min-width:200px">
-                <label style="font-size:.8rem;text-transform:uppercase;color:#666">Ваше Имя</label>
-                <input type="text" id="userName" placeholder="Иван Петров">
+                <label style="font-size:.8rem;text-transform:uppercase;color:#666">Кличка лошади</label>
+                <input type="text" id="userName" placeholder="Буян, Звёздочка..." required>
             </div>
         </div>
 
@@ -161,7 +161,7 @@ footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;paddi
     </div>
 </section>
 
-<footer>&copy; 2025 КСК Васькино. Чеховский район.</footer>
+<footer>&copy; 2026 КСК Васькино. Чеховский район.<br>Разработано AIchemy Lab</footer>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -435,7 +435,7 @@ async function submitBooking() {
     const service = document.getElementById('serviceType').value;
     const notes   = document.getElementById('notes').value.trim();
 
-    if(!email || !name) { alert('Введите email и имя'); return; }
+    if(!email || !name) { alert('Введите email и кличку лошади'); return; }
     if(!service)        { alert('Выберите услугу'); return; }
     if(!selectedSlot)   { alert('Выберите время в календаре'); return; }
 
