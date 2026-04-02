@@ -34,39 +34,45 @@ header{position:fixed;top:0;width:100%;background:var(--g800);color:var(--white)
 .cal-nav-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;flex-wrap:wrap;gap:10px}
 .calendar-nav{background:none;border:1px solid var(--g100);padding:8px 15px;cursor:pointer;border-radius:4px;font-weight:600;font-family:'Jost',sans-serif}
 .calendar-nav:hover{background:var(--g50)}
-
-/* Таблица — строгий grid */
 .cal-wrap{overflow-x:auto;border:1px solid var(--g100);border-radius:8px}
 table.cal{border-collapse:collapse;min-width:100%;table-layout:fixed}
 table.cal th,table.cal td{border:1px solid var(--g100);text-align:center;font-size:.75rem;padding:0;white-space:nowrap}
-table.cal thead th{background:var(--g50);font-weight:600;padding:6px 4px;position:sticky;top:0;z-index:2;min-width:44px}
-table.cal thead th.day-col{width:56px;min-width:56px;position:sticky;left:0;z-index:3;background:var(--g50)}
-table.cal tbody td.day-label{position:sticky;left:0;background:white;z-index:1;font-weight:600;padding:4px 6px;border-right:2px solid var(--gold);min-width:56px;width:56px}
+table.cal thead th{background:var(--g50);font-weight:600;padding:6px 4px;position:sticky;top:0;z-index:2;min-width:46px}
+table.cal thead th.day-col{width:58px;min-width:58px;position:sticky;left:0;z-index:3;background:var(--g50)}
+table.cal tbody td.day-label{position:sticky;left:0;background:white;z-index:1;font-weight:600;padding:4px 6px;border-right:2px solid var(--gold);min-width:58px;width:58px}
 table.cal tbody td.day-label.today{background:rgba(196,151,58,.08)}
-
-.slot{width:100%;height:46px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s;font-size:.75rem}
-.slot:hover{background:var(--g100)}
-.slot.past{background:#f0f0f0;opacity:.4;pointer-events:none}
-.slot.free{background:var(--g50)}
+.slot{width:100%;height:46px;display:flex;align-items:center;justify-content:center;font-size:.72rem;transition:.15s}
+.slot.past{background:#eee;opacity:.35;pointer-events:none}
+.slot.free{background:var(--g50);cursor:pointer}
+.slot.free:hover{background:var(--g100)}
 .slot.booked{background:rgba(184,76,42,.15);color:var(--red);pointer-events:none}
-.slot.blocked{background:rgba(184,76,42,.07);color:var(--red);pointer-events:none;font-size:.65rem}
-.slot.partial{background:rgba(196,151,58,.12);cursor:pointer}
-.slot.mine{background:rgba(196,151,58,.25);border:2px solid var(--gold);cursor:pointer}
-.slot.mine-ext{background:rgba(196,151,58,.1);border:2px dashed var(--gold-dk);pointer-events:none}
-
-input,select,textarea{width:100%;padding:12px;margin-bottom:15px;border:1px solid var(--g100);border-radius:6px;font-family:'Jost',sans-serif;font-size:1rem}
-button[type=submit]{width:100%}
+.slot.partial{background:rgba(196,151,58,.13);cursor:pointer}
+.slot.partial:hover{background:rgba(196,151,58,.22)}
+.slot.mine{background:rgba(196,151,58,.28);border:2px solid var(--gold);cursor:pointer}
+.slot.mine-ext{background:rgba(196,151,58,.13);border:2px dashed var(--gold-dk);pointer-events:none}
+/* выбор диапазона */
+.slot.svc-ok{background:#d4edda;cursor:pointer;outline:2px solid #28a745}
+.slot.svc-ok:hover{background:#b8dfc4}
+.slot.svc-no{background:#f8d7da;pointer-events:none;opacity:.6}
+.slot.selecting{background:rgba(196,151,58,.4);outline:2px solid var(--gold-dk)}
+/* услуги */
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:20px}
+.svc-btn{border:2px solid var(--g100);border-radius:8px;padding:10px 12px;cursor:pointer;background:white;font-family:'Jost',sans-serif;font-size:.85rem;text-align:left;transition:.15s}
+.svc-btn:hover{border-color:var(--gold);background:var(--g50)}
+.svc-btn.active{border-color:var(--gold);background:rgba(196,151,58,.12);font-weight:600}
+.svc-btn b{display:block;margin-bottom:2px}
+.svc-btn span{color:#888;font-size:.75rem}
+input,textarea{width:100%;padding:12px;margin-bottom:15px;border:1px solid var(--g100);border-radius:6px;font-family:'Jost',sans-serif;font-size:1rem}
 .booking-item{border-bottom:1px solid var(--g100);padding:10px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .booking-item:last-child{border-bottom:none}
 .btn-danger{background:rgba(184,76,42,.1);color:var(--red);border:1px solid var(--red);padding:5px 10px;font-size:.8rem;cursor:pointer;border-radius:4px;font-family:'Jost',sans-serif;white-space:nowrap}
-footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;padding:40px;font-size:.9rem}
-
-/* Админ-панель */
+.btn-sm{background:rgba(13,38,24,.07);border:1px solid var(--g100);padding:5px 10px;font-size:.8rem;cursor:pointer;border-radius:4px;font-family:'Jost',sans-serif}
 #adminPanel{display:none;background:#fffbf0;border:1px solid var(--gold);border-radius:8px;padding:16px;margin-bottom:20px}
-#adminPanel h3{margin-top:0;color:var(--g800)}
+#adminPanel h3{margin-top:0}
 .admin-booking{border-bottom:1px solid var(--g100);padding:8px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;font-size:.85rem}
 .admin-booking:last-child{border-bottom:none}
-
+.step-hint{background:var(--g50);border-left:3px solid var(--gold);padding:10px 14px;border-radius:0 6px 6px 0;font-size:.9rem;margin-bottom:16px;color:var(--g800)}
+footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;padding:40px;font-size:.9rem}
 @media(max-width:768px){.hero h1{font-size:2.5rem}}
 </style>
 </head>
@@ -90,11 +96,12 @@ footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;paddi
 <section id="booking" class="section">
     <h2 class="section-title">Расписание бочки</h2>
 
+    <!-- Шаг 1: данные -->
     <div class="card">
         <div style="display:flex;gap:20px;margin-bottom:20px;flex-wrap:wrap">
             <div style="flex:1;min-width:200px">
                 <label style="font-size:.8rem;text-transform:uppercase;color:#666">Ваш Email</label>
-                <input type="email" id="userEmail" placeholder="email@example.com">
+                <input type="email" id="userEmail" placeholder="email@example.com" required>
             </div>
             <div style="flex:1;min-width:200px">
                 <label style="font-size:.8rem;text-transform:uppercase;color:#666">Кличка лошади</label>
@@ -102,51 +109,48 @@ footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;paddi
             </div>
         </div>
 
-        <div class="cal-nav-row">
-            <h3 id="monthLabel" style="margin:0">Загрузка...</h3>
-            <div>
-                <button class="calendar-nav" id="prevWeek">← Неделя</button>
-                <button class="calendar-nav" id="todayBtn">Сегодня</button>
-                <button class="calendar-nav" id="nextWeek">Неделя →</button>
+        <!-- Шаг 2: услуга -->
+        <div class="step-hint" id="stepHint">Шаг 1 — выберите услугу</div>
+        <div class="svc-grid" id="svcGrid"></div>
+
+        <!-- Шаг 3: календарь -->
+        <div id="calSection" style="display:none">
+            <div class="cal-nav-row">
+                <h3 id="monthLabel" style="margin:0">Загрузка...</h3>
+                <div>
+                    <button class="calendar-nav" id="prevWeek">← Неделя</button>
+                    <button class="calendar-nav" id="todayBtn">Сегодня</button>
+                    <button class="calendar-nav" id="nextWeek">Неделя →</button>
+                </div>
             </div>
-        </div>
-
-        <div class="cal-wrap">
-            <table class="cal" id="calTable">
-                <thead id="calHead"></thead>
-                <tbody id="calBody"></tbody>
-            </table>
-        </div>
-
-        <div style="margin-top:12px;display:flex;gap:16px;font-size:.8rem;color:#666;flex-wrap:wrap">
-            <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;background:var(--g50);border:1px solid var(--g100);display:inline-block"></span>Свободно</span>
-            <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;background:rgba(184,76,42,.15);border:1px solid var(--g100);display:inline-block"></span>Занято</span>
-            <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;background:rgba(196,151,58,.25);border:2px solid var(--gold);display:inline-block"></span>Моя запись</span>
-            <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;background:rgba(196,151,58,.12);border:1px solid var(--g100);display:inline-block"></span>Частично занято</span>
+            <div class="cal-wrap">
+                <table class="cal"><thead id="calHead"></thead><tbody id="calBody"></tbody></table>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:14px;font-size:.78rem;color:#666;flex-wrap:wrap">
+                <span><span style="display:inline-block;width:12px;height:12px;background:var(--g50);border:1px solid var(--g100);vertical-align:middle"></span> Свободно</span>
+                <span><span style="display:inline-block;width:12px;height:12px;background:#d4edda;border:2px solid #28a745;vertical-align:middle"></span> Доступно для вас</span>
+                <span><span style="display:inline-block;width:12px;height:12px;background:rgba(196,151,58,.13);border:1px solid var(--gold);vertical-align:middle"></span> Частично занято</span>
+                <span><span style="display:inline-block;width:12px;height:12px;background:rgba(184,76,42,.15);vertical-align:middle"></span> Занято</span>
+                <span><span style="display:inline-block;width:12px;height:12px;background:rgba(196,151,58,.28);border:2px solid var(--gold);vertical-align:middle"></span> Моя запись</span>
+            </div>
         </div>
     </div>
 
-    <!-- Публичные комментарии к слотам -->
+    <!-- Шаг 4: подтверждение -->
+    <div class="card" id="formCard" style="display:none">
+        <h3 style="margin-top:0">Подтверждение записи</h3>
+        <div id="bookingSummary" style="background:var(--g50);border-radius:6px;padding:12px;margin-bottom:16px;font-size:.9rem"></div>
+        <textarea id="notes" rows="2" placeholder="Комментарий (телефон, пожелания...)"></textarea>
+        <div style="display:flex;gap:10px">
+            <button class="btn" id="submitBtn">Подтвердить запись</button>
+            <button class="calendar-nav" id="cancelSelBtn">Отмена</button>
+        </div>
+    </div>
+
+    <!-- Публичные комментарии слота -->
     <div class="card" id="commentsCard" style="display:none">
         <h3 style="margin-top:0" id="commentsTitle">Записи на этот слот</h3>
         <div id="commentsList"></div>
-    </div>
-
-    <div class="card" id="formCard" style="display:none">
-        <h3 style="margin-top:0">Оформление: <span id="selectedTimeLabel"></span></h3>
-        <select id="serviceType">
-            <option value="">Выберите услугу...</option>
-            <optgroup label="Групповые (до 3 чел, одновременно)">
-                <option value="rent30">Аренда 30 мин</option>
-                <option value="rent60">Аренда 60 мин</option>
-            </optgroup>
-            <optgroup label="Индивидуальные (бочка полностью)">
-                <option value="cord30">Корда 30 мин</option>
-                <option value="active30">Активная лошадь 30 мин</option>
-            </optgroup>
-        </select>
-        <textarea id="notes" rows="3" placeholder="Комментарий (кличка лошади, телефон, пожелания...)"></textarea>
-        <button class="btn" id="submitBtn">Подтвердить запись</button>
     </div>
 
     <!-- Админ-панель -->
@@ -155,17 +159,22 @@ footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;paddi
         <div id="adminBookings"></div>
     </div>
 
+    <!-- Мои записи -->
     <div class="card">
         <h3 style="margin-top:0">Мои записи</h3>
         <div id="myBookings"><p style="color:#999">Введите email чтобы увидеть свои записи</p></div>
     </div>
 </section>
 
-<footer>&copy; 2026 КСК Васькино. Чеховский район.<br>Разработано AIchemy Lab</footer>
+<footer>
+    &copy; 2026 КСК Васькино. Чеховский район.<br>
+    Разработано AIchemy Lab
+</footer>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, query, where, onSnapshot }
+import { getFirestore, collection, addDoc, deleteDoc, updateDoc,
+         doc, query, where, onSnapshot }
     from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const app = initializeApp({
@@ -178,391 +187,427 @@ const app = initializeApp({
 });
 const db = getFirestore(app);
 
-let bookings = [], selectedSlot = null, currentOffset = 0, isAdmin = false;
+// ── Справочник услуг ──────────────────────────────────────────────────────────
+// limit: макс лошадей в одном слоте; indiv: true = полная блокировка слота
+const SERVICES = {
+    barrel_indiv: { name:'Бочка индивидуальная', desc:'только ваша лошадь',        limit:1, indiv:true  },
+    barrel_group: { name:'Бочка групповая',      desc:'до 3 лошадей одновременно', limit:3, indiv:false },
+    cord_indiv:   { name:'Корда индивидуальная', desc:'только ваша лошадь',        limit:1, indiv:true  },
+    cord_pair:    { name:'Корда пара',           desc:'до 2 лошадей',              limit:2, indiv:false },
+    active:       { name:'Активная лошадь',      desc:'всегда индивидуально',      limit:1, indiv:true  },
+};
 
-// Слоты: каждые 30 минут с 8:00 до 20:30
+// ── Слоты времени ─────────────────────────────────────────────────────────────
 const TIMES = [];
 for(let h = 8; h <= 20; h++) {
     TIMES.push(`${String(h).padStart(2,'0')}:00`);
-    if(h < 20) TIMES.push(`${String(h).padStart(2,'0')}:30`);
+    TIMES.push(`${String(h).padStart(2,'0')}:30`);
 }
-// Добавляем 20:30 явно
-TIMES.push('20:30');
+TIMES.pop(); // убираем 20:30 — последний слот 20:00 (30 мин до конца)
 
-const SERVICES = {
-    rent30:   { name:'Аренда 30 мин',   group:true,  slots:1 },
-    rent60:   { name:'Аренда 60 мин',   group:true,  slots:2 },
-    cord30:   { name:'Корда 30 мин',    group:false, slots:1 },
-    active30: { name:'Активная 30 мин', group:false, slots:1 }
-};
+// ── Состояние ─────────────────────────────────────────────────────────────────
+let bookings     = [];
+let currentOffset = 0;
+let isAdmin      = false;
+let selectedSvc  = null;   // ключ услуги
+let selStart     = null;   // {date, time} — первый выбранный слот
+let selEnd       = null;   // {date, time} — последний выбранный слот
 
-// ── Дата-хелперы ─────────────────────────────────────────────────────────────
-
+// ── Дата-хелперы ──────────────────────────────────────────────────────────────
 function todayStr() {
     const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 }
-
-function dateStr(d) {
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-
-function addDays(d, n) {
-    const r = new Date(d); r.setDate(r.getDate() + n); return r;
-}
-
+function dateStr(d) { return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function pad(n) { return String(n).padStart(2,'0'); }
+function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate()+n); return r; }
 function getMonday(d) {
-    const r = new Date(d);
-    const day = r.getDay();
-    const diff = (day === 0) ? -6 : 1 - day;
-    r.setDate(r.getDate() + diff);
+    const r = new Date(d), day = r.getDay();
+    r.setDate(r.getDate() + (day===0 ? -6 : 1-day));
     return r;
 }
-
-// Текущее время в минутах от полуночи
-function nowMinutes() {
-    const n = new Date();
-    return n.getHours() * 60 + n.getMinutes();
-}
-
-// Время слота в минутах от полуночи
-function timeToMinutes(t) {
-    const [h, m] = t.split(':').map(Number);
-    return h * 60 + m;
-}
-
-// Прошёл ли слот?
+function timeToMin(t) { const [h,m]=t.split(':').map(Number); return h*60+m; }
 function isPast(ds, time) {
     const today = todayStr();
     if(ds < today) return true;
     if(ds > today) return false;
-    // сегодня — сравниваем минуты
-    return timeToMinutes(time) < nowMinutes();
+    return timeToMin(time) < new Date().getHours()*60 + new Date().getMinutes();
 }
+function timeIdx(t) { return TIMES.indexOf(t); }
 
 // ── Логика занятости ──────────────────────────────────────────────────────────
 
-// Все временны́е слоты, которые занимает запись b (с учётом длительности)
-function occupiedTimes(b) {
-    const slots = SERVICES[b.service]?.slots || 1;
-    const idx   = TIMES.indexOf(b.time);
+// Все слоты времени, занятые записью b (start..start+slots-1)
+function occupiedBy(b) {
+    const svc = SERVICES[b.service];
+    if(!svc) return [b.time];
+    const from = timeIdx(b.timeStart || b.time);
+    const to   = timeIdx(b.timeEnd   || b.time);
     const result = [];
-    for(let i = 0; i < slots; i++) {
-        if(TIMES[idx + i]) result.push(TIMES[idx + i]);
-    }
+    for(let i = from; i <= to; i++) if(TIMES[i]) result.push(TIMES[i]);
     return result;
 }
 
-// Статус ячейки (dateStr, time) для данного пользователя
-function cellStatus(ds, time, myEmail) {
-    // Все записи на этот день
-    const dayBookings = bookings.filter(b => b.date === ds);
-
-    // Какие записи занимают этот слот (возможно, через duration)
-    const covering = dayBookings.filter(b => occupiedTimes(b).includes(time));
-
-    // Моя запись, которая начинается именно здесь
-    const myDirect = covering.find(b => b.email === myEmail && b.time === time);
-    // Моя запись, которая «накрывает» этот слот (хвост 60 мин)
-    const myExt    = covering.find(b => b.email === myEmail && b.time !== time);
-
-    if(myDirect) return { type:'mine',     booking: myDirect };
-    if(myExt)    return { type:'mine-ext', booking: myExt };
-
-    // Чужие записи, занимающие слот
-    const others = covering.filter(b => b.email !== myEmail);
-
-    if(others.length === 0) return { type:'free' };
-
-    // Есть ли среди них индивидуальная (блокирует полностью)?
-    const hasIndiv = others.some(b => !SERVICES[b.service]?.group);
-    if(hasIndiv) return { type:'booked' };
-
-    // Все групповые — проверяем заполненность
-    // Слот считается заблокированным если:
-    // - 3 и более групповых
-    // - или пришла 60-мин запись, и текущий слот — её второй (хвост чужой)
-    const isTailOfOther = others.some(b => b.time !== time);
-    if(isTailOfOther) return { type:'blocked' };
-
-    if(others.length >= 3) return { type:'booked' };
-
-    return { type:'partial', count: others.length };
+// Все записи, занимающие слот (ds, time)
+function coveringSlot(ds, time) {
+    return bookings.filter(b => b.date === ds && occupiedBy(b).includes(time));
 }
 
-// Можно ли записаться на (ds, time) с услугой service?
-function canBook(ds, time, service, myEmail) {
-    const svc = SERVICES[service];
-    if(!svc) return false;
-    const idx = TIMES.indexOf(time);
-    for(let i = 0; i < svc.slots; i++) {
-        const t = TIMES[idx + i];
-        if(!t) return false; // выходит за пределы расписания
-        const st = cellStatus(ds, t, myEmail);
-        if(svc.group) {
-            // групповая: слот должен быть свободным или частично занятым ТОЛЬКО групповыми
-            if(st.type === 'booked' || st.type === 'blocked' || st.type === 'mine' || st.type === 'mine-ext') return false;
-            // Проверяем что нет индивидуальных в этом слоте
-            const covering = bookings.filter(b => b.date === ds && occupiedTimes(b).includes(t));
-            if(covering.some(b => !SERVICES[b.service]?.group)) return false;
-        } else {
-            // индивидуальная: слот должен быть полностью свободен
-            if(st.type !== 'free') return false;
-        }
+// Статус ячейки для пользователя с myEmail
+function cellStatus(ds, time, myEmail) {
+    const covering = coveringSlot(ds, time);
+    const myDirect = covering.find(b => b.email === myEmail && b.timeStart === time);
+    const myExt    = covering.find(b => b.email === myEmail && b.timeStart !== time);
+    if(myDirect) return { type:'mine',     booking:myDirect };
+    if(myExt)    return { type:'mine-ext', booking:myExt };
+
+    const others = covering.filter(b => b.email !== myEmail);
+    if(others.length === 0) return { type:'free' };
+
+    // Есть индивидуальная — полная блокировка
+    if(others.some(b => SERVICES[b.service]?.indiv)) return { type:'booked' };
+
+    // Все групповые — проверяем лимит по самой строгой услуге в слоте
+    const minLimit = Math.min(...others.map(b => SERVICES[b.service]?.limit ?? 99));
+    if(others.length >= minLimit) return { type:'booked' };
+
+    return { type:'partial', count:others.length, limit:minLimit };
+}
+
+// Можно ли записать услугу svcKey начиная со слота timeIdx idx?
+function canBook(ds, timeStart, timeEnd, svcKey, myEmail) {
+    const svc = SERVICES[svcKey];
+    const from = timeIdx(timeStart), to = timeIdx(timeEnd);
+    if(from < 0 || to < 0 || to < from) return false;
+
+    for(let i = from; i <= to; i++) {
+        const t = TIMES[i];
+        if(!t || isPast(ds, t)) return false;
+        const covering = coveringSlot(ds, t).filter(b => b.email !== myEmail);
+        if(covering.length === 0) continue;
+        // Любая индивидуальная в слоте — нельзя
+        if(covering.some(b => SERVICES[b.service]?.indiv)) return false;
+        // Мы сами индивидуальные — нельзя если уже кто-то есть
+        if(svc.indiv) return false;
+        // Групповые — проверяем лимит (наш и чужой)
+        const minLimit = Math.min(svc.limit, ...covering.map(b => SERVICES[b.service]?.limit ?? 99));
+        if(covering.length >= minLimit) return false;
     }
     return true;
 }
 
-// ── Firebase ──────────────────────────────────────────────────────────────────
+// ── Рендер услуг ─────────────────────────────────────────────────────────────
+function renderServices() {
+    const grid = document.getElementById('svcGrid');
+    grid.innerHTML = Object.entries(SERVICES).map(([key, s]) => `
+        <button class="svc-btn${selectedSvc===key?' active':''}" data-svc="${key}">
+            <b>${s.name}</b>
+            <span>${s.desc}</span>
+        </button>`).join('');
+    grid.querySelectorAll('.svc-btn').forEach(btn =>
+        btn.addEventListener('click', () => selectService(btn.dataset.svc)));
+}
 
+function selectService(key) {
+    selectedSvc = key;
+    selStart = selEnd = null;
+    document.getElementById('formCard').style.display = 'none';
+    document.getElementById('commentsCard').style.display = 'none';
+    document.getElementById('calSection').style.display = 'block';
+    document.getElementById('stepHint').textContent =
+        `Шаг 2 — выберите начало записи в календаре (${SERVICES[key].name})`;
+    renderServices();
+    renderCalendar();
+}
+
+// ── Рендер календаря ─────────────────────────────────────────────────────────
+function renderCalendar() {
+    const monday  = getMonday(addDays(new Date(), currentOffset*7));
+    document.getElementById('monthLabel').innerText =
+        monday.toLocaleDateString('ru', {month:'long', year:'numeric'});
+
+    const myEmail = document.getElementById('userEmail').value.trim().toLowerCase();
+    const today   = todayStr();
+
+    // Заголовок
+    let headHtml = '<tr><th class="day-col">День</th>';
+    TIMES.forEach(t => { headHtml += `<th>${t}</th>`; });
+    document.getElementById('calHead').innerHTML = headHtml + '</tr>';
+
+    // Тело
+    let bodyHtml = '';
+    for(let i = 0; i < 7; i++) {
+        const day = addDays(monday, i);
+        const ds  = dateStr(day);
+        const isToday = ds === today;
+        bodyHtml += `<tr><td class="day-label${isToday?' today':''}">${day.toLocaleDateString('ru',{weekday:'short'})}<br><b>${day.getDate()}</b></td>`;
+
+        TIMES.forEach(time => {
+            if(isPast(ds, time)) {
+                bodyHtml += `<td><div class="slot past"></div></td>`; return;
+            }
+            const st = cellStatus(ds, time, myEmail);
+
+            // Определяем класс с учётом режима выбора
+            if(st.type === 'mine') {
+                const tip = SERVICES[st.booking.service]?.name || st.booking.service;
+                const note = st.booking.notes ? ` · ${st.booking.notes}` : '';
+                bodyHtml += `<td><div class="slot mine" data-cancel="${st.booking.id}" title="${tip}${note}">✓</div></td>`;
+            } else if(st.type === 'mine-ext') {
+                bodyHtml += `<td><div class="slot mine-ext" title="продолжение">+</div></td>`;
+            } else if(selectedSvc) {
+                // Режим выбора — подсвечиваем доступность
+                const ok = canBook(ds, time, time, selectedSvc, myEmail);
+
+                // Если начало уже выбрано — только тот же день
+                if(selStart && selStart.date !== ds) {
+                    const cls = st.type==='booked' ? 'booked' : 'free';
+                    bodyHtml += `<td><div class="slot ${cls}" data-view="${ds}|${time}">${st.type==='booked'?'✕':''}</div></td>`;
+                } else if(selStart && ds === selStart.date) {
+                    // подсвечиваем диапазон
+                    const fromIdx = timeIdx(selStart.time);
+                    const toIdx   = timeIdx(time);
+                    const inRange = toIdx >= fromIdx;
+                    // проверяем весь диапазон от start до time
+                    const rangeOk = inRange && canBook(ds, selStart.time, time, selectedSvc, myEmail);
+                    const isSelecting = selStart && toIdx >= fromIdx && rangeOk;
+                    if(isSelecting) {
+                        bodyHtml += `<td><div class="slot selecting" data-select="${ds}|${time}">`;
+                        bodyHtml += toIdx === fromIdx ? '▶' : (toIdx === timeIdx(selStart.time) ? '▶' : '◀');
+                        bodyHtml += `</div></td>`;
+                    } else if(ok) {
+                        bodyHtml += `<td><div class="slot svc-ok" data-select="${ds}|${time}"></div></td>`;
+                    } else {
+                        bodyHtml += `<td><div class="slot ${st.type==='booked'?'booked':'svc-no'}" data-view="${ds}|${time}">${st.type==='booked'?'✕':''}</div></td>`;
+                    }
+                } else {
+                    // начало не выбрано
+                    if(ok) {
+                        bodyHtml += `<td><div class="slot svc-ok" data-select="${ds}|${time}"></div></td>`;
+                    } else if(st.type==='partial') {
+                        bodyHtml += `<td><div class="slot svc-no" data-view="${ds}|${time}">${st.count}/${st.limit}</div></td>`;
+                    } else {
+                        bodyHtml += `<td><div class="slot ${st.type==='booked'?'booked':'svc-no'}" data-view="${ds}|${time}">${st.type==='booked'?'✕':''}</div></td>`;
+                    }
+                }
+            } else {
+                // Режим просмотра (услуга не выбрана)
+                if(st.type==='booked') {
+                    bodyHtml += `<td><div class="slot booked" data-view="${ds}|${time}">✕</div></td>`;
+                } else if(st.type==='partial') {
+                    bodyHtml += `<td><div class="slot partial" data-view="${ds}|${time}">${st.count}/${st.limit}</div></td>`;
+                } else {
+                    bodyHtml += `<td><div class="slot free"></div></td>`;
+                }
+            }
+        });
+        bodyHtml += '</tr>';
+    }
+
+    const body = document.getElementById('calBody');
+    body.innerHTML = bodyHtml;
+
+    // События
+    body.querySelectorAll('.slot[data-cancel]').forEach(el =>
+        el.addEventListener('click', () => cancelBooking(el.dataset.cancel)));
+
+    body.querySelectorAll('.slot[data-view]').forEach(el =>
+        el.addEventListener('click', () => showSlotComments(el.dataset.view)));
+
+    body.querySelectorAll('.slot[data-select]').forEach(el =>
+        el.addEventListener('click', () => handleSlotSelect(el.dataset.select)));
+}
+
+// ── Выбор слотов ─────────────────────────────────────────────────────────────
+function handleSlotSelect(key) {
+    const [ds, time] = key.split('|');
+    const myEmail = document.getElementById('userEmail').value.trim().toLowerCase();
+
+    if(!selStart) {
+        // Первый клик — начало
+        selStart = { date:ds, time };
+        selEnd   = null;
+        document.getElementById('stepHint').textContent =
+            `Шаг 3 — выберите конец записи (или тот же слот для 30 мин). Начало: ${ds} ${time}`;
+        renderCalendar();
+    } else if(selStart.date === ds) {
+        // Второй клик — конец
+        const from = timeIdx(selStart.time), to = timeIdx(time);
+        if(to < from) { selStart = { date:ds, time }; selEnd = null; renderCalendar(); return; }
+        if(!canBook(ds, selStart.time, time, selectedSvc, myEmail)) {
+            alert('Этот диапазон недоступен. Попробуйте другой.'); return;
+        }
+        selEnd = { date:ds, time };
+        showBookingForm();
+    }
+}
+
+function showBookingForm() {
+    const svc = SERVICES[selectedSvc];
+    const dur = (timeIdx(selEnd.time) - timeIdx(selStart.time) + 1) * 30;
+    document.getElementById('bookingSummary').innerHTML =
+        `<b>${svc.name}</b><br>${selStart.date} · ${selStart.time}–${TIMES[timeIdx(selEnd.time)+1]||selEnd.time} (${dur} мин)`;
+    document.getElementById('notes').value = '';
+    document.getElementById('formCard').style.display = 'block';
+    document.getElementById('formCard').scrollIntoView({behavior:'smooth'});
+    document.getElementById('stepHint').textContent = 'Шаг 4 — подтвердите запись';
+}
+
+// ── Firebase ──────────────────────────────────────────────────────────────────
 onSnapshot(
     query(collection(db, 'bookings'), where('date', '>=', todayStr())),
     snap => {
-        bookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        bookings = snap.docs.map(d => ({id:d.id, ...d.data()}));
         renderCalendar();
         updateMyBookings();
         if(isAdmin) renderAdmin();
     }
 );
 
-// ── Рендер календаря ─────────────────────────────────────────────────────────
-
-function renderCalendar() {
-    const monday = getMonday(addDays(new Date(), currentOffset * 7));
-    document.getElementById('monthLabel').innerText =
-        monday.toLocaleDateString('ru', { month:'long', year:'numeric' });
-
-    const myEmail = document.getElementById('userEmail').value.trim().toLowerCase();
-    const today   = todayStr();
-
-    // Заголовок
-    const head = document.getElementById('calHead');
-    let headHtml = '<tr><th class="day-col">День</th>';
-    TIMES.forEach(t => { headHtml += `<th>${t}</th>`; });
-    headHtml += '</tr>';
-    head.innerHTML = headHtml;
-
-    // Тело
-    const body = document.getElementById('calBody');
-    let bodyHtml = '';
-
-    for(let i = 0; i < 7; i++) {
-        const day = addDays(monday, i);
-        const ds  = dateStr(day);
-        const isToday = ds === today;
-        const dayLabel = day.toLocaleDateString('ru', { weekday:'short' }) + '<br><b>' + day.getDate() + '</b>';
-
-        bodyHtml += `<tr><td class="day-label${isToday ? ' today' : ''}">${dayLabel}</td>`;
-
-        TIMES.forEach(time => {
-            if(isPast(ds, time)) {
-                bodyHtml += `<td><div class="slot past"></div></td>`;
-                return;
-            }
-            const st = cellStatus(ds, time, myEmail);
-
-            if(st.type === 'mine') {
-                const svcName = SERVICES[st.booking.service]?.name || st.booking.service;
-                const hasNote = st.booking.notes ? ` · ${st.booking.notes}` : '';
-                bodyHtml += `<td><div class="slot mine" data-cancel="${st.booking.id}" title="${svcName}${hasNote}">✓</div></td>`;
-            } else if(st.type === 'mine-ext') {
-                bodyHtml += `<td><div class="slot mine-ext" title="продолжение">+</div></td>`;
-            } else if(st.type === 'booked') {
-                bodyHtml += `<td><div class="slot booked" data-view="${ds}|${time}">✕</div></td>`;
-            } else if(st.type === 'blocked') {
-                bodyHtml += `<td><div class="slot blocked" data-view="${ds}|${time}">—</div></td>`;
-            } else if(st.type === 'partial') {
-                bodyHtml += `<td><div class="slot partial" data-date="${ds}" data-time="${time}" data-view="${ds}|${time}">${st.count}/3</div></td>`;
-            } else {
-                bodyHtml += `<td><div class="slot free" data-date="${ds}" data-time="${time}"></div></td>`;
-            }
-        });
-
-        bodyHtml += '</tr>';
-    }
-    body.innerHTML = bodyHtml;
-
-    // Навешиваем события
-    body.querySelectorAll('.slot[data-date]').forEach(el => {
-        el.addEventListener('click', () => selectSlot(el.dataset.date, el.dataset.time));
-    });
-    body.querySelectorAll('.slot[data-cancel]').forEach(el => {
-        el.addEventListener('click', () => cancelBooking(el.dataset.cancel));
-    });
-    body.querySelectorAll('.slot[data-view]').forEach(el => {
-        el.addEventListener('click', () => showSlotComments(el.dataset.view));
-    });
-}
-
-// ── Публичные комментарии слота ───────────────────────────────────────────────
-
-function showSlotComments(key) {
-    const [ds, time] = key.split('|');
-    const card = document.getElementById('commentsCard');
-    const title = document.getElementById('commentsTitle');
-    const list  = document.getElementById('commentsList');
-
-    const covering = bookings.filter(b => b.date === ds && occupiedTimes(b).includes(time));
-    if(covering.length === 0) { card.style.display = 'none'; return; }
-
-    title.innerText = `Записи на ${ds} в ${time}`;
-    list.innerHTML = covering.map(b => `
-        <div class="booking-item">
-            <div>
-                <b>${b.client}</b> · ${SERVICES[b.service]?.name || b.service}<br>
-                ${b.notes ? `<span style="color:#555;font-size:.9rem">💬 ${b.notes}</span>` : '<span style="color:#aaa;font-size:.85rem">Комментарий не указан</span>'}
-            </div>
-        </div>`).join('');
-
-    card.style.display = 'block';
-    card.scrollIntoView({ behavior:'smooth' });
-}
-
-// ── Бронирование ─────────────────────────────────────────────────────────────
-
-function selectSlot(ds, time) {
-    selectedSlot = { date: ds, time };
-    document.getElementById('formCard').style.display = 'block';
-    document.getElementById('selectedTimeLabel').innerText = `${ds} в ${time}`;
-    document.getElementById('serviceType').value = '';
-    document.getElementById('notes').value = '';
-    document.getElementById('formCard').scrollIntoView({ behavior:'smooth' });
-}
-
 async function submitBooking() {
-    const email   = document.getElementById('userEmail').value.trim();
-    const name    = document.getElementById('userName').value.trim();
-    const service = document.getElementById('serviceType').value;
-    const notes   = document.getElementById('notes').value.trim();
-
-    if(!email || !name) { alert('Введите email и кличку лошади'); return; }
-    if(!service)        { alert('Выберите услугу'); return; }
-    if(!selectedSlot)   { alert('Выберите время в календаре'); return; }
+    const email = document.getElementById('userEmail').value.trim();
+    const horse = document.getElementById('userName').value.trim();
+    const notes = document.getElementById('notes').value.trim();
+    if(!email) { alert('Введите email'); return; }
+    if(!horse) { alert('Введите кличку лошади'); return; }
+    if(!selectedSvc || !selStart || !selEnd) { alert('Выберите услугу и время'); return; }
 
     const myEmail = email.toLowerCase();
-
-    if(!canBook(selectedSlot.date, selectedSlot.time, service, myEmail)) {
-        alert('Этот слот недоступен для выбранной услуги. Пожалуйста, выберите другое время.');
-        return;
+    if(!canBook(selStart.date, selStart.time, selEnd.time, selectedSvc, myEmail)) {
+        alert('Слот уже занят. Пожалуйста, выберите другое время.'); return;
     }
 
     await addDoc(collection(db, 'bookings'), {
-        date:      selectedSlot.date,
-        time:      selectedSlot.time,
-        service,
+        date:      selStart.date,
+        timeStart: selStart.time,
+        timeEnd:   selEnd.time,
+        time:      selStart.time, // для обратной совместимости
+        service:   selectedSvc,
         email:     myEmail,
-        client:    name,
+        client:    horse,
         notes,
         createdAt: new Date()
     });
 
     alert('Запись добавлена!');
-    selectedSlot = null;
+    selStart = selEnd = null;
+    selectedSvc = null;
     document.getElementById('formCard').style.display = 'none';
+    document.getElementById('stepHint').textContent = 'Шаг 1 — выберите услугу';
+    renderServices();
+    renderCalendar();
 }
 
 async function cancelBooking(id) {
-    if(confirm('Отменить запись?')) {
-        await deleteDoc(doc(db, 'bookings', id));
-    }
+    if(confirm('Отменить запись?')) await deleteDoc(doc(db, 'bookings', id));
 }
 
-// ── Мои записи ───────────────────────────────────────────────────────────────
+// ── Публичные комментарии ─────────────────────────────────────────────────────
+function showSlotComments(key) {
+    const [ds, time] = key.split('|');
+    const card  = document.getElementById('commentsCard');
+    const title = document.getElementById('commentsTitle');
+    const list  = document.getElementById('commentsList');
+    const covering = bookings.filter(b => b.date===ds && occupiedBy(b).includes(time));
+    if(!covering.length) { card.style.display='none'; return; }
+    title.innerText = `Записи на ${ds} в ${time}`;
+    list.innerHTML = covering.map(b => `
+        <div class="booking-item">
+            <div>
+                <b>${b.client}</b> · ${SERVICES[b.service]?.name || b.service}
+                · ${b.timeStart}–${TIMES[timeIdx(b.timeEnd)+1]||b.timeEnd}<br>
+                ${b.notes ? `<span style="color:#555;font-size:.9rem">💬 ${b.notes}</span>`
+                           : '<span style="color:#aaa;font-size:.85rem">Без комментария</span>'}
+            </div>
+        </div>`).join('');
+    card.style.display = 'block';
+    card.scrollIntoView({behavior:'smooth'});
+}
 
+// ── Мои записи ────────────────────────────────────────────────────────────────
 function updateMyBookings() {
     const email = document.getElementById('userEmail').value.trim().toLowerCase();
     const list  = document.getElementById('myBookings');
-    if(!email) { list.innerHTML = '<p style="color:#999">Введите email чтобы увидеть свои записи</p>'; return; }
-
-    const mine = bookings.filter(b => b.email === email).sort((a,b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
-
-    if(mine.length === 0) {
-        list.innerHTML = '<p style="color:#999">Нет активных записей</p>';
-    } else {
-        list.innerHTML = mine.map(b => `
-            <div class="booking-item">
-                <div>
-                    <b>${b.date} ${b.time}</b><br>
-                    ${SERVICES[b.service]?.name || b.service}
-                    ${b.notes ? `<br><span style="color:#666;font-size:.85rem">💬 ${b.notes}</span>` : ''}
-                </div>
-                <button class="btn-danger" data-cancel="${b.id}">Отменить</button>
-            </div>`).join('');
-        list.querySelectorAll('.btn-danger').forEach(btn =>
-            btn.addEventListener('click', () => cancelBooking(btn.dataset.cancel)));
-    }
+    if(!email) { list.innerHTML='<p style="color:#999">Введите email чтобы увидеть свои записи</p>'; return; }
+    const mine = bookings.filter(b=>b.email===email)
+        .sort((a,b)=>a.date.localeCompare(b.date)||a.timeStart.localeCompare(b.timeStart));
+    if(!mine.length) { list.innerHTML='<p style="color:#999">Нет активных записей</p>'; return; }
+    list.innerHTML = mine.map(b => {
+        const dur = (timeIdx(b.timeEnd)-timeIdx(b.timeStart)+1)*30;
+        return `<div class="booking-item">
+            <div>
+                <b>${b.date} ${b.timeStart}–${TIMES[timeIdx(b.timeEnd)+1]||b.timeEnd}</b> (${dur} мин)<br>
+                ${SERVICES[b.service]?.name||b.service}
+                ${b.notes?`<br><span style="color:#666;font-size:.85rem">💬 ${b.notes}</span>`:''}
+            </div>
+            <button class="btn-danger" data-cancel="${b.id}">Отменить</button>
+        </div>`;
+    }).join('');
+    list.querySelectorAll('.btn-danger').forEach(btn=>
+        btn.addEventListener('click',()=>cancelBooking(btn.dataset.cancel)));
 }
 
-// ── Админ-панель ─────────────────────────────────────────────────────────────
-
+// ── Админ-панель ──────────────────────────────────────────────────────────────
 function renderAdmin() {
     const panel = document.getElementById('adminPanel');
     const list  = document.getElementById('adminBookings');
     panel.style.display = 'block';
-
-    const sorted = [...bookings].sort((a,b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
-
-    if(sorted.length === 0) {
-        list.innerHTML = '<p style="color:#999">Записей нет</p>';
-        return;
-    }
-
-    list.innerHTML = sorted.map(b => `
-        <div class="admin-booking" id="ab-${b.id}">
+    const sorted = [...bookings].sort((a,b)=>a.date.localeCompare(b.date)||a.timeStart.localeCompare(b.timeStart));
+    if(!sorted.length) { list.innerHTML='<p style="color:#999">Записей нет</p>'; return; }
+    list.innerHTML = sorted.map(b => {
+        const dur = (timeIdx(b.timeEnd)-timeIdx(b.timeStart)+1)*30;
+        return `<div class="admin-booking" id="ab-${b.id}">
             <div style="flex:1">
-                <b>${b.date} ${b.time}</b> · ${SERVICES[b.service]?.name || b.service}<br>
+                <b>${b.date} ${b.timeStart}–${TIMES[timeIdx(b.timeEnd)+1]||b.timeEnd}</b> (${dur} мин)
+                · ${SERVICES[b.service]?.name||b.service}<br>
                 <span style="color:#444">${b.client} &lt;${b.email}&gt;</span><br>
-                <span style="color:#666;font-size:.85rem">💬 </span>
-                <span id="note-${b.id}" style="color:#555;font-size:.85rem">${b.notes || '—'}</span>
+                <span style="color:#666;font-size:.85rem">💬 <span id="note-${b.id}">${b.notes||'—'}</span></span>
             </div>
             <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
                 <button class="btn-danger" data-cancel="${b.id}">Удалить</button>
-                <button style="background:rgba(13,38,24,.08);border:1px solid var(--g100);padding:5px 10px;font-size:.8rem;cursor:pointer;border-radius:4px;font-family:'Jost',sans-serif" data-edit="${b.id}" data-notes="${(b.notes||'').replace(/"/g,'&quot;')}">✏️ Изменить</button>
+                <button class="btn-sm" data-edit="${b.id}" data-notes="${(b.notes||'').replace(/"/g,'&quot;')}">✏️ Изменить</button>
             </div>
-        </div>`).join('');
-
-    list.querySelectorAll('.btn-danger').forEach(btn =>
-        btn.addEventListener('click', () => cancelBooking(btn.dataset.cancel)));
-
-    list.querySelectorAll('[data-edit]').forEach(btn =>
-        btn.addEventListener('click', async () => {
-            const id = btn.dataset.edit;
-            const cur = btn.dataset.notes;
-            const newNote = prompt('Комментарий:', cur);
-            if(newNote === null) return;
-            await updateDoc(doc(db, 'bookings', id), { notes: newNote });
-            document.getElementById(`note-${id}`).innerText = newNote || '—';
-            btn.dataset.notes = newNote;
+        </div>`;
+    }).join('');
+    list.querySelectorAll('.btn-danger').forEach(btn=>
+        btn.addEventListener('click',()=>cancelBooking(btn.dataset.cancel)));
+    list.querySelectorAll('[data-edit]').forEach(btn=>
+        btn.addEventListener('click', async()=>{
+            const id=btn.dataset.edit, cur=btn.dataset.notes;
+            const newNote=prompt('Комментарий:',cur);
+            if(newNote===null) return;
+            await updateDoc(doc(db,'bookings',id),{notes:newNote});
         }));
 }
 
 // ── События ───────────────────────────────────────────────────────────────────
-
-document.getElementById('prevWeek').addEventListener('click', () => { currentOffset--; renderCalendar(); });
-document.getElementById('nextWeek').addEventListener('click', () => { currentOffset++; renderCalendar(); });
-document.getElementById('todayBtn').addEventListener('click', () => { currentOffset = 0; renderCalendar(); });
-
-document.getElementById('userEmail').addEventListener('input', () => {
+document.getElementById('prevWeek').addEventListener('click',()=>{currentOffset--;renderCalendar();});
+document.getElementById('nextWeek').addEventListener('click',()=>{currentOffset++;renderCalendar();});
+document.getElementById('todayBtn').addEventListener('click',()=>{currentOffset=0;renderCalendar();});
+document.getElementById('userEmail').addEventListener('input',()=>{renderCalendar();updateMyBookings();});
+document.getElementById('submitBtn').addEventListener('click',submitBooking);
+document.getElementById('cancelSelBtn').addEventListener('click',()=>{
+    selStart=selEnd=null;
+    document.getElementById('formCard').style.display='none';
+    document.getElementById('stepHint').textContent=
+        selectedSvc ? `Шаг 2 — выберите начало записи (${SERVICES[selectedSvc].name})` : 'Шаг 1 — выберите услугу';
     renderCalendar();
-    updateMyBookings();
 });
-
-document.getElementById('submitBtn').addEventListener('click', submitBooking);
-
-document.getElementById('adminLink').addEventListener('click', e => {
+document.getElementById('adminLink').addEventListener('click',e=>{
     e.preventDefault();
-    if(isAdmin) { isAdmin = false; document.getElementById('adminPanel').style.display = 'none'; return; }
-    const pass = prompt('Пароль администратора:');
-    if(pass === 'admin-ksk_2026') {
-        isAdmin = true;
-        renderAdmin();
-    } else if(pass !== null) {
-        alert('Неверный пароль');
-    }
+    if(isAdmin){isAdmin=false;document.getElementById('adminPanel').style.display='none';return;}
+    const pass=prompt('Пароль администратора:');
+    if(pass==='admin-ksk_2026'){isAdmin=true;renderAdmin();}
+    else if(pass!==null) alert('Неверный пароль');
 });
+
+// Инициализация
+renderServices();
+document.getElementById('calSection').style.display='block';
+renderCalendar();
 
 if('serviceWorker' in navigator)
-    navigator.serviceWorker.register('./sw.js', { scope:'./' }).catch(console.error);
+    navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(console.error);
 </script>
 </body>
 </html>
