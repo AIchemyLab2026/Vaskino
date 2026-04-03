@@ -190,10 +190,10 @@ const db = getFirestore(app);
 // ── Справочник услуг ──────────────────────────────────────────────────────────
 // limit: макс лошадей в одном слоте; indiv: true = полная блокировка слота
 const SERVICES = {
-    barrel_indiv: { name:'Бочка индивидуальная', desc:'только ваша лошадь',        limit:1, indiv:true  },
+    barrel_indiv: { name:'Бочка', desc:'только ваша лошадь',        limit:1, indiv:true  },
     barrel_group: { name:'Бочка групповая',      desc:'до 3 лошадей одновременно', limit:3, indiv:false },
     cord_indiv:   { name:'Корда индивидуальная', desc:'только ваша лошадь',        limit:1, indiv:true  },
-    cord_pair:    { name:'Корда пара',           desc:'до 2 лошадей',              limit:2, indiv:false },
+    cord_pair:    { name:'Корда групповая',           desc:'до 2 лошадей',              limit:2, indiv:false },
     active:       { name:'Активная лошадь',      desc:'всегда индивидуально',      limit:1, indiv:true  },
 };
 
@@ -356,38 +356,22 @@ function renderCalendar() {
             } else if(st.type === 'mine-ext') {
                 bodyHtml += `<td><div class="slot mine-ext" title="продолжение">+</div></td>`;
             } else if(selectedSvc) {
-                // Режим выбора — подсвечиваем доступность
-                const ok = canBook(ds, time, time, selectedSvc, myEmail);
+                // Режим выбора — слот уже выбран как start или end?
+                const isSelStart = selStart && selStart.date===ds && selStart.time===time;
+                const isSelEnd   = selEnd   && selEnd.date===ds   && selEnd.time===time;
 
-                // Если начало уже выбрано — только тот же день
-                if(selStart && selStart.date !== ds) {
-                    const cls = st.type==='booked' ? 'booked' : 'free';
-                    bodyHtml += `<td><div class="slot ${cls}" data-view="${ds}|${time}">${st.type==='booked'?'✕':''}</div></td>`;
-                } else if(selStart && ds === selStart.date) {
-                    // подсвечиваем диапазон
-                    const fromIdx = timeIdx(selStart.time);
-                    const toIdx   = timeIdx(time);
-                    const inRange = toIdx >= fromIdx;
-                    // проверяем весь диапазон от start до time
-                    const rangeOk = inRange && canBook(ds, selStart.time, time, selectedSvc, myEmail);
-                    const isSelecting = selStart && toIdx >= fromIdx && rangeOk;
-                    if(isSelecting) {
-                        bodyHtml += `<td><div class="slot selecting" data-select="${ds}|${time}">`;
-                        bodyHtml += toIdx === fromIdx ? '▶' : (toIdx === timeIdx(selStart.time) ? '▶' : '◀');
-                        bodyHtml += `</div></td>`;
-                    } else if(ok) {
-                        bodyHtml += `<td><div class="slot svc-ok" data-select="${ds}|${time}"></div></td>`;
-                    } else {
-                        bodyHtml += `<td><div class="slot ${st.type==='booked'?'booked':'svc-no'}" data-view="${ds}|${time}">${st.type==='booked'?'✕':''}</div></td>`;
-                    }
+                if(isSelStart || isSelEnd) {
+                    bodyHtml += `<td><div class="slot selecting" data-select="${ds}|${time}">✓</div></td>`;
                 } else {
-                    // начало не выбрано
+                    const ok = canBook(ds, time, time, selectedSvc, myEmail);
                     if(ok) {
                         bodyHtml += `<td><div class="slot svc-ok" data-select="${ds}|${time}"></div></td>`;
                     } else if(st.type==='partial') {
-                        bodyHtml += `<td><div class="slot svc-no" data-view="${ds}|${time}">${st.count}/${st.limit}</div></td>`;
+                        bodyHtml += `<td><div class="slot partial" data-view="${ds}|${time}">${st.count}/${st.limit}</div></td>`;
+                    } else if(st.type==='booked') {
+                        bodyHtml += `<td><div class="slot booked" data-view="${ds}|${time}">✕</div></td>`;
                     } else {
-                        bodyHtml += `<td><div class="slot ${st.type==='booked'?'booked':'svc-no'}" data-view="${ds}|${time}">${st.type==='booked'?'✕':''}</div></td>`;
+                        bodyHtml += `<td><div class="slot svc-no" data-view="${ds}|${time}"></div></td>`;
                     }
                 }
             } else {
@@ -423,22 +407,39 @@ function handleSlotSelect(key) {
     const [ds, time] = key.split('|');
     const myEmail = document.getElementById('userEmail').value.trim().toLowerCase();
 
+    if(!canBook(ds, time, time, selectedSvc, myEmail)) return;
+
     if(!selStart) {
-        // Первый клик — начало
+        // Первый клик
         selStart = { date:ds, time };
         selEnd   = null;
         document.getElementById('stepHint').textContent =
-            `Шаг 3 — выберите конец записи (или тот же слот для 30 мин). Начало: ${ds} ${time}`;
+            `Шаг 3 — кликните последний нужный слот (или этот же для 30 мин). Начало: ${ds} ${time}`;
         renderCalendar();
-    } else if(selStart.date === ds) {
-        // Второй клик — конец
+    } else if(!selEnd) {
+        // Второй клик
+        if(ds !== selStart.date) {
+            // Другой день — начинаем заново
+            selStart = { date:ds, time }; selEnd = null; renderCalendar(); return;
+        }
         const from = timeIdx(selStart.time), to = timeIdx(time);
-        if(to < from) { selStart = { date:ds, time }; selEnd = null; renderCalendar(); return; }
+        if(to < from) {
+            // Клик раньше начала — перезапускаем
+            selStart = { date:ds, time }; selEnd = null; renderCalendar(); return;
+        }
         if(!canBook(ds, selStart.time, time, selectedSvc, myEmail)) {
-            alert('Этот диапазон недоступен. Попробуйте другой.'); return;
+            alert('Этот диапазон недоступен. Выберите другое время.'); return;
         }
         selEnd = { date:ds, time };
         showBookingForm();
+        renderCalendar();
+    } else {
+        // Уже выбран диапазон — начинаем заново
+        selStart = { date:ds, time }; selEnd = null;
+        document.getElementById('formCard').style.display = 'none';
+        document.getElementById('stepHint').textContent =
+            `Шаг 3 — кликните последний нужный слот. Начало: ${ds} ${time}`;
+        renderCalendar();
     }
 }
 
@@ -515,7 +516,7 @@ function showSlotComments(key) {
         <div class="booking-item">
             <div>
                 <b>${b.client}</b> · ${SERVICES[b.service]?.name || b.service}
-                · ${b.timeStart}–${TIMES[timeIdx(b.timeEnd)+1]||b.timeEnd}<br>
+                · ${b.timeStart||b.time}–${TIMES[timeIdx(b.timeEnd||b.time)+1]||(b.timeEnd||b.time)}<br>
                 ${b.notes ? `<span style="color:#555;font-size:.9rem">💬 ${b.notes}</span>`
                            : '<span style="color:#aaa;font-size:.85rem">Без комментария</span>'}
             </div>
@@ -530,13 +531,14 @@ function updateMyBookings() {
     const list  = document.getElementById('myBookings');
     if(!email) { list.innerHTML='<p style="color:#999">Введите email чтобы увидеть свои записи</p>'; return; }
     const mine = bookings.filter(b=>b.email===email)
-        .sort((a,b)=>a.date.localeCompare(b.date)||a.timeStart.localeCompare(b.timeStart));
+        .sort((a,b)=>a.date.localeCompare(b.date)||(a.timeStart||a.time||'').localeCompare(b.timeStart||b.time||''));
     if(!mine.length) { list.innerHTML='<p style="color:#999">Нет активных записей</p>'; return; }
     list.innerHTML = mine.map(b => {
-        const dur = (timeIdx(b.timeEnd)-timeIdx(b.timeStart)+1)*30;
+        const ts = b.timeStart||b.time||'?', te = b.timeEnd||b.time||'?';
+        const dur = (timeIdx(te)-timeIdx(ts)+1)*30;
         return `<div class="booking-item">
             <div>
-                <b>${b.date} ${b.timeStart}–${TIMES[timeIdx(b.timeEnd)+1]||b.timeEnd}</b> (${dur} мин)<br>
+                <b>${b.date} ${ts}–${TIMES[timeIdx(te)+1]||te}</b> (${dur} мин)<br>
                 ${SERVICES[b.service]?.name||b.service}
                 ${b.notes?`<br><span style="color:#666;font-size:.85rem">💬 ${b.notes}</span>`:''}
             </div>
@@ -552,13 +554,14 @@ function renderAdmin() {
     const panel = document.getElementById('adminPanel');
     const list  = document.getElementById('adminBookings');
     panel.style.display = 'block';
-    const sorted = [...bookings].sort((a,b)=>a.date.localeCompare(b.date)||a.timeStart.localeCompare(b.timeStart));
+    const sorted = [...bookings].sort((a,b)=>a.date.localeCompare(b.date)||(a.timeStart||a.time||'').localeCompare(b.timeStart||b.time||''));
     if(!sorted.length) { list.innerHTML='<p style="color:#999">Записей нет</p>'; return; }
     list.innerHTML = sorted.map(b => {
-        const dur = (timeIdx(b.timeEnd)-timeIdx(b.timeStart)+1)*30;
+        const ts = b.timeStart||b.time||'?', te = b.timeEnd||b.time||'?';
+        const dur = (timeIdx(te)-timeIdx(ts)+1)*30;
         return `<div class="admin-booking" id="ab-${b.id}">
             <div style="flex:1">
-                <b>${b.date} ${b.timeStart}–${TIMES[timeIdx(b.timeEnd)+1]||b.timeEnd}</b> (${dur} мин)
+                <b>${b.date} ${ts}–${TIMES[timeIdx(te)+1]||te}</b> (${dur} мин)
                 · ${SERVICES[b.service]?.name||b.service}<br>
                 <span style="color:#444">${b.client} &lt;${b.email}&gt;</span><br>
                 <span style="color:#666;font-size:.85rem">💬 <span id="note-${b.id}">${b.notes||'—'}</span></span>
@@ -585,6 +588,7 @@ document.getElementById('prevWeek').addEventListener('click',()=>{currentOffset-
 document.getElementById('nextWeek').addEventListener('click',()=>{currentOffset++;renderCalendar();});
 document.getElementById('todayBtn').addEventListener('click',()=>{currentOffset=0;renderCalendar();});
 document.getElementById('userEmail').addEventListener('input',()=>{renderCalendar();updateMyBookings();});
+document.getElementById('userEmail').addEventListener('change',()=>{renderCalendar();updateMyBookings();});
 document.getElementById('submitBtn').addEventListener('click',submitBooking);
 document.getElementById('cancelSelBtn').addEventListener('click',()=>{
     selStart=selEnd=null;
