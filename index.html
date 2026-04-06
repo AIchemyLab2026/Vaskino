@@ -415,7 +415,7 @@ function renderCalendar() {
                 const isSelEnd   = selEnd   && selEnd.date===ds   && selEnd.time===time;
 
                 if(isSelStart || isSelEnd) {
-                    bodyHtml += `<td><div class="slot selecting" data-select="${ds}|${time}">✓</div></td>`;
+                    bodyHtml += `<td><div class="slot selecting" data-select="${ds}|${time}" style="cursor:pointer">✓</div></td>`;
                 } else {
                     const ok = canBook(ds, time, time, selectedSvc, myEmail);
                     if(ok) {
@@ -445,15 +445,14 @@ function renderCalendar() {
     const body = document.getElementById('calBody');
     body.innerHTML = bodyHtml;
 
-    // События
-    body.querySelectorAll('.slot[data-cancel]').forEach(el =>
-        el.addEventListener('click', () => cancelBooking(el.dataset.cancel)));
-
-    body.querySelectorAll('.slot[data-view]').forEach(el =>
-        el.addEventListener('click', () => showSlotComments(el.dataset.view)));
-
-    body.querySelectorAll('.slot[data-select]').forEach(el =>
-        el.addEventListener('click', () => handleSlotSelect(el.dataset.select)));
+    // Единое делегирование — не теряет клики после перерисовки
+    body.onclick = e => {
+        const sl = e.target.closest('.slot');
+        if(!sl) return;
+        if(sl.dataset.cancel) { cancelBooking(sl.dataset.cancel); return; }
+        if(sl.dataset.select) { handleSlotSelect(sl.dataset.select); return; }
+        if(sl.dataset.view)   { showSlotComments(sl.dataset.view);   return; }
+    };
 }
 
 // ── Выбор слотов ─────────────────────────────────────────────────────────────
