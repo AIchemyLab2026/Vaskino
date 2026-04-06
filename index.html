@@ -10,6 +10,7 @@
 <link rel="apple-touch-icon" href="crest.png">
 <link rel="icon" href="crest.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -186,6 +187,47 @@ const app = initializeApp({
     appId:             "1:563099619411:web:53b713a949831b3263f6a6"
 });
 const db = getFirestore(app);
+
+// ── EmailJS ───────────────────────────────────────────────────────────────────
+emailjs.init('xv3TyxfVjneY9FIpX');
+
+const EJS_SERVICE  = 'service_ll0nd4f';
+const EJS_CONFIRM  = 'template_qrt8x2j';
+const EJS_CANCEL   = 'template_fosc2h3';
+
+function formatTime(ts, te) {
+    const endIdx = TIMES.indexOf(te) + 1;
+    const endTime = TIMES[endIdx] || te;
+    return `${ts} – ${endTime}`;
+}
+
+async function sendConfirmation(booking) {
+    try {
+        await emailjs.send(EJS_SERVICE, EJS_CONFIRM, {
+            to_email:  booking.email,
+            horse:     booking.client,
+            service:   SERVICES[booking.service]?.name || booking.service,
+            date:      booking.date,
+            time_start: booking.timeStart || booking.time,
+            time_end:  TIMES[TIMES.indexOf(booking.timeEnd || booking.time) + 1] || booking.timeEnd || booking.time,
+            notes:     booking.notes || 'не указан',
+        });
+    } catch(e) { console.warn('EmailJS confirm:', e); }
+}
+
+async function sendCancellation(booking) {
+    try {
+        await emailjs.send(EJS_SERVICE, EJS_CANCEL, {
+            to_email:  booking.email,
+            horse:     booking.client,
+            service:   SERVICES[booking.service]?.name || booking.service,
+            date:      booking.date,
+            time_start: booking.timeStart || booking.time,
+            time_end:  TIMES[TIMES.indexOf(booking.timeEnd || booking.time) + 1] || booking.timeEnd || booking.time,
+            notes:     booking.notes || 'не указан',
+        });
+    } catch(e) { console.warn('EmailJS cancel:', e); }
+}
 
 // ── Справочник услуг ──────────────────────────────────────────────────────────
 // limit: макс лошадей в одном слоте; indiv: true = полная блокировка слота
@@ -490,7 +532,16 @@ async function submitBooking() {
         createdAt: new Date()
     });
 
-    alert('Запись добавлена!');
+    await sendConfirmation({
+        email:     myEmail,
+        client:    horse,
+        service:   selectedSvc,
+        date:      selStart.date,
+        timeStart: selStart.time,
+        timeEnd:   selEnd.time,
+        notes,
+    });
+    alert('Запись добавлена! Подтверждение отправлено на ' + myEmail);
     selStart = selEnd = null;
     selectedSvc = null;
     document.getElementById('formCard').style.display = 'none';
@@ -500,7 +551,13 @@ async function submitBooking() {
 }
 
 async function cancelBooking(id) {
-    if(confirm('Отменить запись?')) await deleteDoc(doc(db, 'bookings', id));
+    const label = isAdmin ? 'Удалить запись и уведомить клиента?' : 'Отменить запись?';
+    if(!confirm(label)) return;
+    const booking = bookings.find(b => b.id === id);
+    await deleteDoc(doc(db, 'bookings', id));
+    if(isAdmin && booking) {
+        await sendCancellation(booking);
+    }
 }
 
 // ── Публичные комментарии ─────────────────────────────────────────────────────
