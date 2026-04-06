@@ -173,8 +173,6 @@ footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;paddi
 </footer>
 
 <script type="module">
-(async () => {
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, addDoc, deleteDoc, updateDoc,
          doc, query, where, onSnapshot }
@@ -191,18 +189,21 @@ const app = initializeApp({
 const db = getFirestore(app);
 
 // ── EmailJS ───────────────────────────────────────────────────────────────────
-// Ждём загрузки EmailJS SDK (на случай медленной сети)
-await new Promise(resolve => {
-    if(window.emailjs) { resolve(); return; }
-    const t = setInterval(() => { if(window.emailjs) { clearInterval(t); resolve(); } }, 50);
-    setTimeout(() => { clearInterval(t); resolve(); }, 3000);
-});
-if(window.emailjs) {
-    window.emailjs.init('xv3TyxfVjneY9FIpX');
-    console.log('EmailJS инициализирован');
-} else {
-    console.error('EmailJS SDK не загрузился');
+function initEmailJS() {
+    return new Promise(resolve => {
+        if(window.emailjs) { window.emailjs.init('xv3TyxfVjneY9FIpX'); resolve(); return; }
+        const t = setInterval(() => {
+            if(window.emailjs) {
+                clearInterval(t);
+                window.emailjs.init('xv3TyxfVjneY9FIpX');
+                console.log('EmailJS инициализирован');
+                resolve();
+            }
+        }, 50);
+        setTimeout(() => { clearInterval(t); console.error('EmailJS не загрузился'); resolve(); }, 3000);
+    });
 }
+initEmailJS();
 
 const EJS_SERVICE  = 'service_ll0nd4f';
 const EJS_CONFIRM  = 'template_qrt8x2j';
@@ -681,7 +682,6 @@ renderCalendar();
 if('serviceWorker' in navigator)
     navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(console.error);
 
-})();
 </script>
 </body>
 </html>
