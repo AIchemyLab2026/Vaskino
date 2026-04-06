@@ -173,6 +173,8 @@ footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;paddi
 </footer>
 
 <script type="module">
+(async () => {
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, addDoc, deleteDoc, updateDoc,
          doc, query, where, onSnapshot }
@@ -189,7 +191,18 @@ const app = initializeApp({
 const db = getFirestore(app);
 
 // ── EmailJS ───────────────────────────────────────────────────────────────────
-emailjs.init('xv3TyxfVjneY9FIpX');
+// Ждём загрузки EmailJS SDK (на случай медленной сети)
+await new Promise(resolve => {
+    if(window.emailjs) { resolve(); return; }
+    const t = setInterval(() => { if(window.emailjs) { clearInterval(t); resolve(); } }, 50);
+    setTimeout(() => { clearInterval(t); resolve(); }, 3000);
+});
+if(window.emailjs) {
+    window.emailjs.init('xv3TyxfVjneY9FIpX');
+    console.log('EmailJS инициализирован');
+} else {
+    console.error('EmailJS SDK не загрузился');
+}
 
 const EJS_SERVICE  = 'service_ll0nd4f';
 const EJS_CONFIRM  = 'template_qrt8x2j';
@@ -201,33 +214,32 @@ function formatTime(ts, te) {
     return `${ts} – ${endTime}`;
 }
 
-async function sendConfirmation(booking) {
+async function sendEmail(templateId, booking) {
+    const ejs = window.emailjs;
+    if(!ejs) { console.error('EmailJS не загружен'); return; }
+    const ts  = booking.timeStart || booking.time || '';
+    const te  = booking.timeEnd   || booking.time || '';
+    const teDisplay = TIMES[TIMES.indexOf(te) + 1] || te;
+    const params = {
+        to_email:   booking.email,
+        horse:      booking.client,
+        service:    SERVICES[booking.service]?.name || booking.service,
+        date:       booking.date,
+        time_start: ts,
+        time_end:   teDisplay,
+        notes:      booking.notes || 'не указан',
+    };
     try {
-        await emailjs.send(EJS_SERVICE, EJS_CONFIRM, {
-            to_email:  booking.email,
-            horse:     booking.client,
-            service:   SERVICES[booking.service]?.name || booking.service,
-            date:      booking.date,
-            time_start: booking.timeStart || booking.time,
-            time_end:  TIMES[TIMES.indexOf(booking.timeEnd || booking.time) + 1] || booking.timeEnd || booking.time,
-            notes:     booking.notes || 'не указан',
-        });
-    } catch(e) { console.warn('EmailJS confirm:', e); }
+        const resp = await ejs.send(EJS_SERVICE, templateId, params);
+        console.log('EmailJS OK:', resp.status, resp.text);
+    } catch(e) {
+        console.error('EmailJS error:', JSON.stringify(e));
+        alert('Ошибка отправки письма: ' + (e.text || e.message || JSON.stringify(e)));
+    }
 }
 
-async function sendCancellation(booking) {
-    try {
-        await emailjs.send(EJS_SERVICE, EJS_CANCEL, {
-            to_email:  booking.email,
-            horse:     booking.client,
-            service:   SERVICES[booking.service]?.name || booking.service,
-            date:      booking.date,
-            time_start: booking.timeStart || booking.time,
-            time_end:  TIMES[TIMES.indexOf(booking.timeEnd || booking.time) + 1] || booking.timeEnd || booking.time,
-            notes:     booking.notes || 'не указан',
-        });
-    } catch(e) { console.warn('EmailJS cancel:', e); }
-}
+async function sendConfirmation(booking) { await sendEmail(EJS_CONFIRM, booking); }
+async function sendCancellation(booking) { await sendEmail(EJS_CANCEL,  booking); }
 
 // ── Справочник услуг ──────────────────────────────────────────────────────────
 // limit: макс лошадей в одном слоте; indiv: true = полная блокировка слота
@@ -669,6 +681,8 @@ renderCalendar();
 
 if('serviceWorker' in navigator)
     navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(console.error);
+
+})();
 </script>
 </body>
 </html>
