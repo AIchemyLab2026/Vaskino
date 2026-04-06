@@ -309,10 +309,8 @@ function renderCal(){
             }
 
             // Режим выбора услуги
-            const isStart=selStart&&selStart.date===ds&&selStart.time===time;
-            const isEnd  =selEnd  &&selEnd.date===ds  &&selEnd.time===time;
-
-            if(isStart||isEnd){
+            const isSel=selectedSlots.some(s=>s.date===ds&&s.time===time);
+            if(isSel){
                 body+=`<td><div class="slot selecting" data-sel="${ds}|${time}">✓</div></td>`; return;
             }
 
@@ -347,58 +345,62 @@ function renderCal(){
     };
 }
 
-// ── Выбор слотов ─────────────────────────────────────────────────────────────
+// ── Выбор слотов — клик переключает галочку ──────────────────────────────────
+// selectedSlots: массив {date, time} в порядке клика, все на один день
+let selectedSlots = [];
+
 function handleSel(key){
     const [ds,time]=key.split('|');
     const email=document.getElementById('userEmail').value.trim().toLowerCase();
 
-    if(!selStart){
-        // Первый клик
-        if(!canBook(ds,time,time,selSvc,email)) return;
-        selStart={date:ds,time};
-        selEnd=null;
-        hint(`Шаг 3 — кликните последний нужный слот (или этот же для 30 мин). Начало: ${time}`);
-        renderCal();
-        return;
+    // Если уже есть слоты на другой день — сбрасываем
+    if(selectedSlots.length && selectedSlots[0].date !== ds){
+        selectedSlots=[];
     }
 
-    // Второй клик
-    if(ds!==selStart.date){
-        // Другой день — начать заново
-        selStart={date:ds,time}; selEnd=null;
-        hint(`Шаг 3 — кликните последний нужный слот. Начало: ${time}`);
-        renderCal(); return;
+    const idx=selectedSlots.findIndex(s=>s.date===ds&&s.time===time);
+    if(idx>=0){
+        // Снять галочку
+        selectedSlots.splice(idx,1);
+    } else {
+        // Поставить галочку — проверяем что слот доступен
+        if(!canBook(ds,time,time,selSvc,email)){
+            alert('Этот слот недоступен для выбранной услуги.'); return;
+        }
+        selectedSlots.push({date:ds,time});
+        // Сортируем по времени
+        selectedSlots.sort((a,b)=>tidx(a.time)-tidx(b.time));
     }
 
-    const from=tidx(selStart.time), to=tidx(time);
-
-    if(to<from){
-        // Раньше начала — сдвинуть начало
-        selStart={date:ds,time}; selEnd=null;
-        hint(`Шаг 3 — кликните последний нужный слот. Начало: ${time}`);
-        renderCal(); return;
+    if(selectedSlots.length===0){
+        selStart=null; selEnd=null;
+        document.getElementById('formCard').style.display='none';
+        hint(`Шаг 2 — кликайте слоты для бронирования (${SVC[selSvc].name})`);
+    } else {
+        selStart={date:selectedSlots[0].date, time:selectedSlots[0].time};
+        selEnd  ={date:selectedSlots[selectedSlots.length-1].date, time:selectedSlots[selectedSlots.length-1].time};
+        // Проверяем что выбранные слоты непрерывны
+        const contiguous = selectedSlots.every((s,i)=>{
+            if(i===0) return true;
+            return tidx(s.time) === tidx(selectedSlots[i-1].time)+1;
+        });
+        if(!contiguous){
+            alert('Выбирайте слоты подряд.'); selectedSlots.pop(); renderCal(); return;
+        }
+        showForm();
     }
-
-    // Тот же слот или позже — проверяем диапазон
-    if(!canBook(ds,selStart.time,time,selSvc,email)){
-        alert('Этот диапазон недоступен. Выберите другое время.'); return;
-    }
-
-    selEnd={date:ds,time};
     renderCal();
-    showForm();
 }
 
 function showForm(){
     const svc=SVC[selSvc];
-    const dur=(tidx(selEnd.time)-tidx(selStart.time)+1)*30;
+    const dur=selectedSlots.length*30;
     const endDisp=TIMES[tidx(selEnd.time)+1]||selEnd.time;
     document.getElementById('bookingSummary').innerHTML=
         `<b>${svc.name}</b><br>${selStart.date} · ${selStart.time} – ${endDisp} (${dur} мин)`;
     document.getElementById('notes').value='';
     document.getElementById('formCard').style.display='block';
-    document.getElementById('formCard').scrollIntoView({behavior:'smooth'});
-    hint('Шаг 4 — подтвердите запись');
+    hint(`Шаг 3 — добавьте комментарий и подтвердите (выбрано ${dur} мин, кликайте ещё для добавления)`);
 }
 
 function hint(t){ document.getElementById('stepHint').textContent=t; }
@@ -446,7 +448,7 @@ async function cancelBooking(id){
 }
 
 function resetSel(){
-    selStart=selEnd=null; selSvc=null;
+    selStart=selEnd=null; selSvc=null; selectedSlots=[];
     document.getElementById('formCard').style.display='none';
     document.getElementById('commentsCard').style.display='none';
     hint('Шаг 1 — выберите услугу');
@@ -541,7 +543,7 @@ document.getElementById('svcGrid').addEventListener('click',e=>{
     const btn=e.target.closest('.svc-btn');
     if(!btn) return;
     selSvc=btn.dataset.svc;
-    selStart=selEnd=null;
+    selStart=selEnd=null; selectedSlots=[];
     document.getElementById('formCard').style.display='none';
     hint(`Шаг 2 — выберите начало записи (${SVC[selSvc].name})`);
     renderSvc(); renderCal();
