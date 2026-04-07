@@ -175,9 +175,10 @@ function ejsReady() { return typeof window.emailjs !== 'undefined'; }
 
 function sendEmail(tpl, params) {
     if(!ejsReady()) { console.error('EmailJS не загружен'); return; }
+    console.log('Sending email', tpl, params.to_email);
     window.emailjs.send(EJS.svc, tpl, params)
-        .then(r => console.log('Email sent', r.status))
-        .catch(e => console.error('Email error', e));
+        .then(r => { console.log('Email OK', r.status, r.text); })
+        .catch(e => { console.error('Email FAIL', JSON.stringify(e)); alert('Ошибка отправки: ' + (e.text||e.message||JSON.stringify(e))); });
 }
 
 // EmailJS init — вызываем когда SDK точно загружен
@@ -189,11 +190,9 @@ tryInitEJS();
 
 // ── Константы ─────────────────────────────────────────────────────────────────
 const SVC = {
-    barrel_indiv: { name:'Бочка',               desc:'только ваша лошадь',        limit:1, indiv:true  },
-    barrel_group: { name:'Бочка групповая',      desc:'до 3 лошадей одновременно', limit:3, indiv:false },
-    cord_indiv:   { name:'Корда индивидуальная', desc:'только ваша лошадь',        limit:1, indiv:true  },
-    cord_pair:    { name:'Корда групповая',       desc:'до 2 лошадей',              limit:2, indiv:false },
-    active:       { name:'Активная лошадь',       desc:'всегда индивидуально',      limit:1, indiv:true  },
+    cord:    { name:'Корда 30 мин',          desc:'индивидуально, 1 клиент',      limit:1, indiv:true,  maxSlots:1 },
+    barrel:  { name:'Аренда бочки 30 мин',   desc:'до 3 клиентов, не более 60 мин', limit:3, indiv:false, maxSlots:2 },
+    active:  { name:'Активная лошадь 30 мин',desc:'индивидуально, не более 60 мин', limit:1, indiv:true,  maxSlots:2 },
 };
 
 const TIMES = [];
@@ -367,6 +366,11 @@ function handleSel(key){
         if(!canBook(ds,time,time,selSvc,email)){
             alert('Этот слот недоступен для выбранной услуги.'); return;
         }
+        // Проверяем лимит слотов подряд (только для клиентов, не для админа)
+        const maxSl = SVC[selSvc]?.maxSlots ?? 99;
+        if(!isAdmin && selectedSlots.length >= maxSl){
+            alert(`Для услуги «${SVC[selSvc].name}» максимум ${maxSl} слот(а) за одну сессию.`); return;
+        }
         selectedSlots.push({date:ds,time});
         // Сортируем по времени
         selectedSlots.sort((a,b)=>tidx(a.time)-tidx(b.time));
@@ -436,8 +440,10 @@ async function cancelBooking(id){
     const lbl=isAdmin?'Удалить запись и уведомить клиента?':'Отменить запись?';
     if(!confirm(lbl)) return;
     const b=bookings.find(x=>x.id===id);
+    console.log('cancelBooking: found booking', b, 'isAdmin', isAdmin);
     await deleteDoc(doc(db,'bookings',id));
     if(isAdmin&&b){
+        console.log('Sending cancel email to', b.email);
         sendEmail(EJS.cancel,{
             to_email:b.email, horse:b.client, service:SVC[b.service]?.name||b.service,
             date:b.date, time_start:b.timeStart||b.time,
