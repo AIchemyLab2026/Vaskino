@@ -471,8 +471,7 @@ function showComments(key){
         <div class="booking-item">
             <div><b>${b.client}</b> · ${SVC[b.service]?.name||b.service}
             · ${b.timeStart||b.time} – ${TIMES[tidx(b.timeEnd||b.time)+1]||(b.timeEnd||b.time)}<br>
-            ${b.notes?`<span style="color:#555;font-size:.9rem">💬 ${b.notes}</span>`
-                     :'<span style="color:#aaa;font-size:.85rem">Без комментария</span>'}
+            ${b.notes&&b.notes.trim()?`<span style="color:#555;font-size:.9rem">💬 ${b.notes.trim()}</span>`:''}
             </div>
         </div>`).join('');
     const card=document.getElementById('commentsCard');
@@ -516,7 +515,7 @@ function renderAdmin(){
             <div style="flex:1">
                 <b>${b.date} ${ts} – ${TIMES[tidx(te)+1]||te}</b> (${dur} мин) · ${SVC[b.service]?.name||b.service}<br>
                 <span style="color:#444">${b.client} &lt;${b.email}&gt;</span><br>
-                <span style="color:#666;font-size:.85rem">💬 <span id="n-${b.id}">${b.notes||'—'}</span></span>
+                <span style="color:#666;font-size:.85rem">💬 <span id="n-${b.id}">${b.notes&&b.notes.trim()||'—'}</span></span>
             </div>
             <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
                 <button class="btn-danger" data-cancel="${b.id}">Удалить</button>
