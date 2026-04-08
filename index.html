@@ -178,7 +178,7 @@ function sendEmail(tpl, params) {
     console.log('Sending email', tpl, params.to_email);
     window.emailjs.send(EJS.svc, tpl, params)
         .then(r => { console.log('Email OK', r.status, r.text); })
-        .catch(e => { console.error('Email FAIL', JSON.stringify(e)); alert('Ошибка отправки: ' + (e.text||e.message||JSON.stringify(e))); });
+        .catch(e => { console.error('Email FAIL', JSON.stringify(e)); });
 }
 
 // EmailJS init — вызываем когда SDK точно загружен
@@ -364,12 +364,13 @@ function handleSel(key){
     } else {
         // Поставить галочку — проверяем что слот доступен
         if(!canBook(ds,time,time,selSvc,email)){
-            alert('Этот слот недоступен для выбранной услуги.'); return;
+            showHint('Этот слот недоступен для выбранной услуги.', 'warn'); return;
         }
         // Проверяем лимит слотов подряд (только для клиентов, не для админа)
         const maxSl = SVC[selSvc]?.maxSlots ?? 99;
         if(!isAdmin && selectedSlots.length >= maxSl){
-            alert(`Для услуги «${SVC[selSvc].name}» максимум ${maxSl} слот(а) за одну сессию.`); return;
+            showHint(`Максимум ${maxSl} слот(а) для «${SVC[selSvc].name}». Для новой сессии — сначала подтвердите текущую.`, 'warn');
+            return;
         }
         selectedSlots.push({date:ds,time});
         // Сортируем по времени
@@ -389,7 +390,7 @@ function handleSel(key){
             return tidx(s.time) === tidx(selectedSlots[i-1].time)+1;
         });
         if(!contiguous){
-            alert('Выбирайте слоты подряд.'); selectedSlots.pop(); renderCal(); return;
+            showHint('Выбирайте слоты подряд.', 'warn'); selectedSlots.pop(); renderCal(); return;
         }
         showForm();
     }
@@ -407,7 +408,24 @@ function showForm(){
     hint(`Шаг 3 — добавьте комментарий и подтвердите (выбрано ${dur} мин, кликайте ещё для добавления)`);
 }
 
-function hint(t){ document.getElementById('stepHint').textContent=t; }
+function hint(t){
+    const el=document.getElementById('stepHint');
+    el._lastHint=t;
+    el.textContent=t;
+    el.style.borderLeftColor='var(--gold)';
+    el.style.background='var(--g50)';
+    el.style.color='var(--g800)';
+}
+function showHint(t, type){
+    const el=document.getElementById('stepHint');
+    el.textContent=t;
+    if(type==='warn'){
+        el.style.borderLeftColor='var(--red)';
+        el.style.background='rgba(184,76,42,.07)';
+        el.style.color='var(--red)';
+        setTimeout(()=>{ hint(el._lastHint||''); },3000);
+    }
+}
 
 // ── Бронирование ─────────────────────────────────────────────────────────────
 async function submitBooking(){
