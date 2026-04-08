@@ -242,10 +242,27 @@ function cellSt(ds,time,email){
     return{type:'partial',count:oth.length,limit:lim};
 }
 
+function bookedSlotsToday(ds, svcKey, email){
+    // Считаем сколько слотов клиент уже забронировал на этот день по этой услуге
+    return bookings
+        .filter(b => b.date===ds && b.service===svcKey && b.email===email)
+        .reduce((sum, b) => sum + (tidx(b.timeEnd||b.time) - tidx(b.timeStart||b.time) + 1), 0);
+}
+
 function canBook(ds,tStart,tEnd,svcKey,email){
     const svc=SVC[svcKey]; if(!svc) return false;
     const from=tidx(tStart),to=tidx(tEnd);
     if(from<0||to<0||to<from) return false;
+
+    // Проверка дневного лимита (не для админа)
+    if(!isAdmin){
+        const alreadyBooked = bookedSlotsToday(ds, svcKey, email);
+        const wantToBook = to - from + 1;
+        if(alreadyBooked + wantToBook > svc.maxSlots){
+            return false;
+        }
+    }
+
     for(let i=from;i<=to;i++){
         const t=TIMES[i];
         if(!t||isPast(ds,t)) return false;
@@ -364,7 +381,14 @@ function handleSel(key){
     } else {
         // Поставить галочку — проверяем что слот доступен
         if(!canBook(ds,time,time,selSvc,email)){
-            showHint('Этот слот недоступен для выбранной услуги.', 'warn'); return;
+            const svc=SVC[selSvc];
+            const already=bookedSlotsToday(ds,selSvc,email);
+            if(!isAdmin && already>=svc.maxSlots){
+                showHint(`Лимит на сегодня исчерпан — «${svc.name}» максимум ${svc.maxSlots} слот(а) в день.`, 'warn');
+            } else {
+                showHint('Этот слот недоступен для выбранной услуги.', 'warn');
+            }
+            return;
         }
         // Проверяем лимит слотов подряд (только для клиентов, не для админа)
         const maxSl = SVC[selSvc]?.maxSlots ?? 99;
