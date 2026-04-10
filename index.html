@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="theme-color" content="#0D2618">
-<meta name="description" content="Онлайн-запись в КСК Васькино. Аренда бочки, занятия на корде.">
+<meta name="description" content="Онлайн-запись в КСК Васькино.">
 <title>КСК Васькино — Бронирование</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="crest.png">
@@ -28,9 +28,8 @@ header{position:fixed;top:0;width:100%;background:var(--g800);color:var(--white)
 .section{padding:80px 5%;max-width:1100px;margin:0 auto}
 .section-title{font-family:'Playfair Display',serif;font-size:2.5rem;margin-bottom:30px;text-align:center}
 .card{background:white;border-radius:12px;box-shadow:0 5px 20px rgba(0,0,0,.05);padding:25px;margin-bottom:20px}
-.cal-nav-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;flex-wrap:wrap;gap:10px}
-.cal-nav-btn{background:none;border:1px solid var(--g100);padding:8px 15px;cursor:pointer;border-radius:4px;font-weight:600;font-family:'Jost',sans-serif}
-.cal-nav-btn:hover{background:var(--g50)}
+.nav-btn{background:none;border:1px solid var(--g100);padding:8px 15px;cursor:pointer;border-radius:4px;font-weight:600;font-family:'Jost',sans-serif;font-size:.85rem}
+.nav-btn:hover{background:var(--g50)}
 .cal-wrap{overflow-x:auto;border:1px solid var(--g100);border-radius:8px}
 table.cal{border-collapse:collapse;min-width:100%;table-layout:fixed}
 table.cal th,table.cal td{border:1px solid var(--g100);text-align:center;font-size:.75rem;padding:0;white-space:nowrap}
@@ -40,7 +39,7 @@ table.cal tbody td.day-label{position:sticky;left:0;background:white;z-index:1;f
 table.cal tbody td.day-label.today{background:rgba(196,151,58,.08)}
 .slot{width:100%;height:46px;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:.15s}
 .slot.past{background:#eee;opacity:.35;pointer-events:none}
-.slot.free{background:var(--g50);cursor:pointer}.slot.free:hover{background:var(--g100)}
+.slot.free{background:var(--g50)}
 .slot.avail{background:#d4edda;cursor:pointer;outline:2px solid #5cb85c}.slot.avail:hover{background:#b8dfc4}
 .slot.selecting{background:rgba(196,151,58,.35);outline:2px solid var(--gold-dk);cursor:pointer}
 .slot.booked{background:rgba(184,76,42,.15);color:var(--red);pointer-events:none}
@@ -48,12 +47,12 @@ table.cal tbody td.day-label.today{background:rgba(196,151,58,.08)}
 .slot.unavail{background:#f5f5f5;color:#ccc;pointer-events:none}
 .slot.mine{background:rgba(196,151,58,.28);border:2px solid var(--gold);cursor:pointer}
 .slot.mine-ext{background:rgba(196,151,58,.13);border:2px dashed var(--gold-dk);pointer-events:none}
-.svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:20px}
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:20px}
 .svc-btn{border:2px solid var(--g100);border-radius:8px;padding:10px 12px;cursor:pointer;background:white;font-family:'Jost',sans-serif;font-size:.85rem;text-align:left;transition:.15s}
 .svc-btn:hover{border-color:var(--gold);background:var(--g50)}
 .svc-btn.active{border-color:var(--gold);background:rgba(196,151,58,.12);font-weight:600}
 .svc-btn b{display:block;margin-bottom:2px}.svc-btn span{color:#888;font-size:.75rem}
-.step-hint{background:var(--g50);border-left:3px solid var(--gold);padding:10px 14px;border-radius:0 6px 6px 0;font-size:.9rem;margin-bottom:16px}
+.step-hint{border-left:3px solid var(--gold);padding:10px 14px;border-radius:0 6px 6px 0;font-size:.9rem;margin-bottom:16px;background:var(--g50);color:var(--g800);transition:.3s}
 input,textarea{width:100%;padding:12px;margin-bottom:15px;border:1px solid var(--g100);border-radius:6px;font-family:'Jost',sans-serif;font-size:1rem}
 .booking-item{border-bottom:1px solid var(--g100);padding:10px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .booking-item:last-child{border-bottom:none}
@@ -71,7 +70,8 @@ footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;paddi
 
 <header>
   <a href="#" class="logo"><img src="crest.png" alt=""><span>КСК Васькино</span></a>
-  <nav style="display:flex;gap:20px">
+  <nav style="display:flex;gap:12px;align-items:center">
+    <a href="#mybookings" class="nav-btn" style="color:var(--white);border-color:rgba(255,255,255,.3)">Мои записи</a>
     <a href="#booking" style="color:white;text-decoration:none;font-size:.9rem">Запись</a>
     <a href="#" id="adminLink" style="color:var(--gold);text-decoration:none;font-size:.9rem">Админ</a>
   </nav>
@@ -88,14 +88,15 @@ footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;paddi
   <h2 class="section-title">Расписание бочки</h2>
 
   <div class="card">
+    <!-- Email + кличка -->
     <div style="display:flex;gap:20px;margin-bottom:20px;flex-wrap:wrap">
       <div style="flex:1;min-width:200px">
         <label style="font-size:.8rem;text-transform:uppercase;color:#666">Ваш Email</label>
-        <input type="email" id="userEmail" placeholder="email@example.com">
+        <input type="email" id="userEmail" placeholder="email@example.com" autocomplete="email">
       </div>
       <div style="flex:1;min-width:200px">
         <label style="font-size:.8rem;text-transform:uppercase;color:#666">Кличка лошади</label>
-        <input type="text" id="userName" placeholder="Буян, Звёздочка...">
+        <input type="text" id="userName" placeholder="Буян, Звёздочка..." autocomplete="nickname">
       </div>
     </div>
 
@@ -103,12 +104,12 @@ footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;paddi
     <div class="svc-grid" id="svcGrid"></div>
 
     <div id="calSection">
-      <div class="cal-nav-row">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;flex-wrap:wrap;gap:10px">
         <h3 id="monthLabel" style="margin:0"></h3>
-        <div>
-          <button class="cal-nav-btn" id="prevWeek">← Неделя</button>
-          <button class="cal-nav-btn" id="todayBtn">Сегодня</button>
-          <button class="cal-nav-btn" id="nextWeek">Неделя →</button>
+        <div style="display:flex;gap:6px">
+          <button class="nav-btn" id="prevWeek">← Неделя</button>
+          <button class="nav-btn" id="todayBtn">Сегодня</button>
+          <button class="nav-btn" id="nextWeek">Неделя →</button>
         </div>
       </div>
       <div class="cal-wrap">
@@ -117,7 +118,7 @@ footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;paddi
       <div style="margin-top:10px;display:flex;gap:14px;font-size:.78rem;color:#666;flex-wrap:wrap">
         <span><i style="display:inline-block;width:12px;height:12px;background:#d4edda;border:2px solid #5cb85c;vertical-align:middle"></i> Доступно</span>
         <span><i style="display:inline-block;width:12px;height:12px;background:rgba(196,151,58,.35);border:2px solid var(--gold-dk);vertical-align:middle"></i> Выбрано</span>
-        <span><i style="display:inline-block;width:12px;height:12px;background:rgba(196,151,58,.13);border:1px solid var(--gold);vertical-align:middle"></i> Частично занято</span>
+        <span><i style="display:inline-block;width:12px;height:12px;background:rgba(196,151,58,.13);border:1px solid var(--gold);vertical-align:middle"></i> Частично</span>
         <span><i style="display:inline-block;width:12px;height:12px;background:rgba(184,76,42,.15);vertical-align:middle"></i> Занято</span>
         <span><i style="display:inline-block;width:12px;height:12px;background:rgba(196,151,58,.28);border:2px solid var(--gold);vertical-align:middle"></i> Моя запись</span>
       </div>
@@ -130,7 +131,7 @@ footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;paddi
     <textarea id="notes" rows="2" placeholder="Комментарий (телефон, пожелания...)"></textarea>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <button class="btn" id="submitBtn">Подтвердить запись</button>
-      <button class="cal-nav-btn" id="cancelSelBtn">Отмена</button>
+      <button class="nav-btn" id="cancelSelBtn">Отмена</button>
     </div>
   </div>
 
@@ -144,7 +145,7 @@ footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;paddi
     <div id="adminList"></div>
   </div>
 
-  <div class="card">
+  <div class="card" id="mybookings">
     <h3 style="margin-top:0">Мои записи</h3>
     <div id="myBookings"><p style="color:#999">Введите email чтобы увидеть свои записи</p></div>
   </div>
@@ -171,34 +172,38 @@ const db = getFirestore(initializeApp({
 // ── EmailJS ───────────────────────────────────────────────────────────────────
 const EJS = { svc:'service_ll0nd4f', confirm:'template_qrt8x2j', cancel:'template_fosc2h3' };
 
-function ejsReady() { return typeof window.emailjs !== 'undefined'; }
-
-function sendEmail(tpl, params) {
-    if(!ejsReady()) { console.error('EmailJS не загружен'); return; }
-    console.log('Sending email', tpl, params.to_email);
-    window.emailjs.send(EJS.svc, tpl, params)
-        .then(r => { console.log('Email OK', r.status, r.text); })
-        .catch(e => { console.error('Email FAIL', JSON.stringify(e)); });
-}
-
-// EmailJS init — вызываем когда SDK точно загружен
-function tryInitEJS() {
-    if(ejsReady()) { window.emailjs.init('xv3TyxfVjneY9FIpX'); }
-    else { setTimeout(tryInitEJS, 100); }
+function tryInitEJS(){
+    if(typeof window.emailjs !== 'undefined'){
+        window.emailjs.init('xv3TyxfVjneY9FIpX');
+        console.log('EmailJS ready');
+    } else {
+        setTimeout(tryInitEJS, 100);
+    }
 }
 tryInitEJS();
 
-// ── Константы ─────────────────────────────────────────────────────────────────
+function sendEmail(tpl, params){
+    if(typeof window.emailjs === 'undefined'){ console.error('EmailJS not loaded'); return; }
+    console.log('sendEmail', tpl, params.to_email);
+    window.emailjs.send(EJS.svc, tpl, params)
+        .then(r => console.log('Email OK', r.status))
+        .catch(e => console.error('Email ERR', JSON.stringify(e)));
+}
+
+// ── Справочник услуг ──────────────────────────────────────────────────────────
+// maxSlots: макс слотов в день на клиента; limit: макс лошадей в одном слоте
 const SVC = {
-    cord:    { name:'Корда 30 мин',          desc:'индивидуально, 1 клиент',      limit:1, indiv:true,  maxSlots:1 },
-    barrel:  { name:'Аренда бочки 30 мин',   desc:'до 3 клиентов, не более 60 мин', limit:3, indiv:false, maxSlots:2 },
-    active:  { name:'Активная лошадь 30 мин',desc:'индивидуально, не более 60 мин', limit:1, indiv:true,  maxSlots:2 },
+    cord:        { name:'Корда 30 мин',             desc:'индивидуально, 1 клиент',        limit:1, indiv:true,  maxSlots:1 },
+    riding30:    { name:'Верховая езда 30 мин',      desc:'до 3 клиентов, не более 60 мин', limit:3, indiv:false, maxSlots:2 },
+    riding60:    { name:'Верховая езда 1 час',       desc:'до 3 клиентов, 2 слота сразу',   limit:3, indiv:false, maxSlots:2 },
+    active:      { name:'Активная лошадь 30 мин',    desc:'индивидуально, не более 60 мин', limit:1, indiv:true,  maxSlots:2 },
 };
 
+// ── Время ─────────────────────────────────────────────────────────────────────
 const TIMES = [];
-for(let h = 8; h <= 20; h++) {
+for(let h=8; h<=20; h++){
     TIMES.push(pad(h)+':00');
-    if(h < 20) TIMES.push(pad(h)+':30');
+    if(h<20) TIMES.push(pad(h)+':30');
 }
 
 function pad(n){ return String(n).padStart(2,'0'); }
@@ -207,16 +212,28 @@ function todayStr(){ const d=new Date(); return d.getFullYear()+'-'+pad(d.getMon
 function dstr(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
 function addDays(d,n){ const r=new Date(d); r.setDate(r.getDate()+n); return r; }
 function getMonday(d){ const r=new Date(d),day=r.getDay(); r.setDate(r.getDate()+(day===0?-6:1-day)); return r; }
-function tmin(t){ const[h,m]=t.split(':').map(Number); return h*60+m; }
 function isPast(ds,t){
     const td=todayStr();
     if(ds<td) return true;
     if(ds>td) return false;
-    const n=new Date(); return tmin(t)<n.getHours()*60+n.getMinutes();
+    const n=new Date(); return (parseInt(t)*60+parseInt(t.slice(3))) < n.getHours()*60+n.getMinutes();
 }
 
 // ── Состояние ─────────────────────────────────────────────────────────────────
-let bookings=[], offset=0, isAdmin=false, selSvc=null, selStart=null, selEnd=null;
+let bookings=[], offset=0, isAdmin=false;
+let selSvc=null, selectedSlots=[];
+
+// ── LocalStorage — запоминаем email и кличку ──────────────────────────────────
+function saveUserData(){
+    localStorage.setItem('vaskino_email', document.getElementById('userEmail').value.trim());
+    localStorage.setItem('vaskino_horse', document.getElementById('userName').value.trim());
+}
+function loadUserData(){
+    const email = localStorage.getItem('vaskino_email')||'';
+    const horse = localStorage.getItem('vaskino_horse')||'';
+    document.getElementById('userEmail').value = email;
+    document.getElementById('userName').value  = horse;
+}
 
 // ── Логика занятости ──────────────────────────────────────────────────────────
 function occupied(b){
@@ -242,25 +259,25 @@ function cellSt(ds,time,email){
     return{type:'partial',count:oth.length,limit:lim};
 }
 
-function bookedSlotsToday(ds, svcKey, email){
-    // Считаем сколько слотов клиент уже забронировал на этот день по этой услуге
+// Считаем уже забронированные слоты клиента за день по данной услуге
+function bookedToday(ds, svcKey, email){
     return bookings
-        .filter(b => b.date===ds && b.service===svcKey && b.email===email)
-        .reduce((sum, b) => sum + (tidx(b.timeEnd||b.time) - tidx(b.timeStart||b.time) + 1), 0);
+        .filter(b=>b.date===ds && b.service===svcKey && b.email===email)
+        .reduce((sum,b)=>sum+(tidx(b.timeEnd||b.time)-tidx(b.timeStart||b.time)+1), 0);
 }
 
 function canBook(ds,tStart,tEnd,svcKey,email){
     const svc=SVC[svcKey]; if(!svc) return false;
-    const from=tidx(tStart),to=tidx(tEnd);
+    const from=tidx(tStart), to=tidx(tEnd);
     if(from<0||to<0||to<from) return false;
 
-    // Проверка дневного лимита (не для админа)
+    // Дневной лимит (не для админа)
     if(!isAdmin){
-        const alreadyBooked = bookedSlotsToday(ds, svcKey, email);
-        const wantToBook = to - from + 1;
-        if(alreadyBooked + wantToBook > svc.maxSlots){
-            return false;
-        }
+        const already = bookedToday(ds, svcKey, email);
+        // Также учитываем уже выбранные в UI слоты
+        const inUI = selectedSlots.filter(s=>s.date===ds).length;
+        const want = to - from + 1;
+        if(already + inUI + want > svc.maxSlots) return false;
     }
 
     for(let i=from;i<=to;i++){
@@ -276,9 +293,23 @@ function canBook(ds,tStart,tEnd,svcKey,email){
     return true;
 }
 
+// ── Подсказка ─────────────────────────────────────────────────────────────────
+function hint(t){
+    const el=document.getElementById('stepHint');
+    el._last=t;
+    el.textContent=t;
+    el.style.cssText='border-left:3px solid var(--gold);padding:10px 14px;border-radius:0 6px 6px 0;font-size:.9rem;margin-bottom:16px;background:var(--g50);color:var(--g800)';
+}
+function warnHint(t){
+    const el=document.getElementById('stepHint');
+    el.textContent=t;
+    el.style.cssText='border-left:3px solid var(--red);padding:10px 14px;border-radius:0 6px 6px 0;font-size:.9rem;margin-bottom:16px;background:rgba(184,76,42,.07);color:var(--red)';
+    setTimeout(()=>hint(el._last||''), 3000);
+}
+
 // ── Рендер услуг ─────────────────────────────────────────────────────────────
 function renderSvc(){
-    document.getElementById('svcGrid').innerHTML=
+    document.getElementById('svcGrid').innerHTML =
         Object.entries(SVC).map(([k,s])=>
             `<button class="svc-btn${selSvc===k?' active':''}" data-svc="${k}"><b>${s.name}</b><span>${s.desc}</span></button>`
         ).join('');
@@ -307,7 +338,6 @@ function renderCal(){
 
             const st=cellSt(ds,time,email);
 
-            // Моя запись — всегда показываем
             if(st.type==='mine'){
                 const tip=SVC[st.b.service]?.name||st.b.service;
                 body+=`<td><div class="slot mine" data-cancel="${st.b.id}" title="${tip}${st.b.notes?' · '+st.b.notes:''}">✓</div></td>`; return;
@@ -317,41 +347,28 @@ function renderCal(){
             }
 
             if(!selSvc){
-                // Режим просмотра
-                if(st.type==='booked')   body+=`<td><div class="slot booked" data-view="${ds}|${time}">✕</div></td>`;
-                else if(st.type==='partial') body+=`<td><div class="slot partial" data-view="${ds}|${time}">${st.count}/${st.limit}</div></td>`;
-                else body+=`<td><div class="slot free"></div></td>`;
+                if(st.type==='booked')        body+=`<td><div class="slot booked" data-view="${ds}|${time}">✕</div></td>`;
+                else if(st.type==='partial')  body+=`<td><div class="slot partial" data-view="${ds}|${time}">${st.count}/${st.limit}</div></td>`;
+                else                          body+=`<td><div class="slot free"></div></td>`;
                 return;
             }
 
-            // Режим выбора услуги
+            // Режим выбора
             const isSel=selectedSlots.some(s=>s.date===ds&&s.time===time);
-            if(isSel){
-                body+=`<td><div class="slot selecting" data-sel="${ds}|${time}">✓</div></td>`; return;
-            }
+            if(isSel){ body+=`<td><div class="slot selecting" data-sel="${ds}|${time}">✓</div></td>`; return; }
 
-            // Слот занят — показываем, но не кликабелен для записи
-            if(st.type==='booked'){
-                body+=`<td><div class="slot booked" data-view="${ds}|${time}">✕</div></td>`; return;
-            }
+            if(st.type==='booked'){ body+=`<td><div class="slot booked" data-view="${ds}|${time}">✕</div></td>`; return; }
 
-            // Проверяем доступность как одиночного слота
             const ok=canBook(ds,time,time,selSvc,email);
-            if(ok){
-                body+=`<td><div class="slot avail" data-sel="${ds}|${time}"></div></td>`;
-            } else if(st.type==='partial'){
-                body+=`<td><div class="slot unavail" data-view="${ds}|${time}">${st.count}/${st.limit}</div></td>`;
-            } else {
-                body+=`<td><div class="slot unavail"></div></td>`;
-            }
+            if(ok)                       body+=`<td><div class="slot avail" data-sel="${ds}|${time}"></div></td>`;
+            else if(st.type==='partial') body+=`<td><div class="slot unavail" data-view="${ds}|${time}">${st.count}/${st.limit}</div></td>`;
+            else                         body+=`<td><div class="slot unavail"></div></td>`;
         });
         body+='</tr>';
     }
 
     const tbody=document.getElementById('calBody');
     tbody.innerHTML=body;
-
-    // Единый обработчик кликов
     tbody.onclick=e=>{
         const sl=e.target.closest('.slot');
         if(!sl) return;
@@ -361,61 +378,40 @@ function renderCal(){
     };
 }
 
-// ── Выбор слотов — клик переключает галочку ──────────────────────────────────
-// selectedSlots: массив {date, time} в порядке клика, все на один день
-let selectedSlots = [];
-
+// ── Выбор слотов ─────────────────────────────────────────────────────────────
 function handleSel(key){
     const [ds,time]=key.split('|');
     const email=document.getElementById('userEmail').value.trim().toLowerCase();
 
-    // Если уже есть слоты на другой день — сбрасываем
-    if(selectedSlots.length && selectedSlots[0].date !== ds){
-        selectedSlots=[];
-    }
+    if(!email){ warnHint('Сначала введите email'); return; }
+
+    // Сброс если другой день
+    if(selectedSlots.length && selectedSlots[0].date!==ds) selectedSlots=[];
 
     const idx=selectedSlots.findIndex(s=>s.date===ds&&s.time===time);
     if(idx>=0){
-        // Снять галочку
         selectedSlots.splice(idx,1);
     } else {
-        // Поставить галочку — проверяем что слот доступен
-        if(!canBook(ds,time,time,selSvc,email)){
-            const svc=SVC[selSvc];
-            const already=bookedSlotsToday(ds,selSvc,email);
-            if(!isAdmin && already>=svc.maxSlots){
-                showHint(`Лимит на сегодня исчерпан — «${svc.name}» максимум ${svc.maxSlots} слот(а) в день.`, 'warn');
-            } else {
-                showHint('Этот слот недоступен для выбранной услуги.', 'warn');
-            }
-            return;
+        // Проверка дневного лимита
+        const svc=SVC[selSvc];
+        const already=bookedToday(ds,selSvc,email);
+        if(!isAdmin && already+selectedSlots.length >= svc.maxSlots){
+            warnHint(`Лимит исчерпан — «${svc.name}» максимум ${svc.maxSlots} слот(а) в день.`); return;
         }
-        // Проверяем лимит слотов подряд (только для клиентов, не для админа)
-        const maxSl = SVC[selSvc]?.maxSlots ?? 99;
-        if(!isAdmin && selectedSlots.length >= maxSl){
-            showHint(`Максимум ${maxSl} слот(а) для «${SVC[selSvc].name}». Для новой сессии — сначала подтвердите текущую.`, 'warn');
-            return;
+        if(!canBook(ds,time,time,selSvc,email)){
+            warnHint('Этот слот недоступен.'); return;
         }
         selectedSlots.push({date:ds,time});
-        // Сортируем по времени
         selectedSlots.sort((a,b)=>tidx(a.time)-tidx(b.time));
+        // Проверяем непрерывность
+        const ok=selectedSlots.every((s,i)=>i===0||tidx(s.time)===tidx(selectedSlots[i-1].time)+1);
+        if(!ok){ warnHint('Выбирайте слоты подряд.'); selectedSlots.pop(); renderCal(); return; }
     }
 
     if(selectedSlots.length===0){
-        selStart=null; selEnd=null;
         document.getElementById('formCard').style.display='none';
-        hint(`Шаг 2 — кликайте слоты для бронирования (${SVC[selSvc].name})`);
+        hint(`Шаг 2 — выберите слоты (${SVC[selSvc].name})`);
     } else {
-        selStart={date:selectedSlots[0].date, time:selectedSlots[0].time};
-        selEnd  ={date:selectedSlots[selectedSlots.length-1].date, time:selectedSlots[selectedSlots.length-1].time};
-        // Проверяем что выбранные слоты непрерывны
-        const contiguous = selectedSlots.every((s,i)=>{
-            if(i===0) return true;
-            return tidx(s.time) === tidx(selectedSlots[i-1].time)+1;
-        });
-        if(!contiguous){
-            showHint('Выбирайте слоты подряд.', 'warn'); selectedSlots.pop(); renderCal(); return;
-        }
         showForm();
     }
     renderCal();
@@ -424,31 +420,14 @@ function handleSel(key){
 function showForm(){
     const svc=SVC[selSvc];
     const dur=selectedSlots.length*30;
-    const endDisp=TIMES[tidx(selEnd.time)+1]||selEnd.time;
+    const tStart=selectedSlots[0].time;
+    const tEnd  =selectedSlots[selectedSlots.length-1].time;
+    const endDisp=TIMES[tidx(tEnd)+1]||tEnd;
     document.getElementById('bookingSummary').innerHTML=
-        `<b>${svc.name}</b><br>${selStart.date} · ${selStart.time} – ${endDisp} (${dur} мин)`;
+        `<b>${svc.name}</b><br>${selectedSlots[0].date} · ${tStart} – ${endDisp} (${dur} мин)`;
     document.getElementById('notes').value='';
     document.getElementById('formCard').style.display='block';
-    hint(`Шаг 3 — добавьте комментарий и подтвердите (выбрано ${dur} мин, кликайте ещё для добавления)`);
-}
-
-function hint(t){
-    const el=document.getElementById('stepHint');
-    el._lastHint=t;
-    el.textContent=t;
-    el.style.borderLeftColor='var(--gold)';
-    el.style.background='var(--g50)';
-    el.style.color='var(--g800)';
-}
-function showHint(t, type){
-    const el=document.getElementById('stepHint');
-    el.textContent=t;
-    if(type==='warn'){
-        el.style.borderLeftColor='var(--red)';
-        el.style.background='rgba(184,76,42,.07)';
-        el.style.color='var(--red)';
-        setTimeout(()=>{ hint(el._lastHint||''); },3000);
-    }
+    hint(`Шаг 3 — подтвердите или добавьте ещё слот`);
 }
 
 // ── Бронирование ─────────────────────────────────────────────────────────────
@@ -456,25 +435,32 @@ async function submitBooking(){
     const email=document.getElementById('userEmail').value.trim();
     const horse=document.getElementById('userName').value.trim();
     const notes=document.getElementById('notes').value.trim();
-    if(!email||!horse){ alert('Введите email и кличку лошади'); return; }
-    if(!selSvc||!selStart||!selEnd){ alert('Выберите услугу и время'); return; }
+    if(!email||!horse){ warnHint('Введите email и кличку лошади'); return; }
+    if(!selSvc||!selectedSlots.length){ warnHint('Выберите услугу и время'); return; }
+
     const me=email.toLowerCase();
-    if(!canBook(selStart.date,selStart.time,selEnd.time,selSvc,me)){
-        alert('Слот занят. Выберите другое время.'); return;
-    }
-    const data={
-        date:selStart.date, timeStart:selStart.time, timeEnd:selEnd.time,
-        time:selStart.time, service:selSvc, email:me, client:horse, notes,
+    const tStart=selectedSlots[0].time;
+    const tEnd  =selectedSlots[selectedSlots.length-1].time;
+    const ds    =selectedSlots[0].date;
+
+    if(!canBook(ds,tStart,tEnd,selSvc,me)){ warnHint('Слот занят. Выберите другое время.'); return; }
+
+    saveUserData();
+
+    await addDoc(collection(db,'bookings'),{
+        date:ds, timeStart:tStart, timeEnd:tEnd, time:tStart,
+        service:selSvc, email:me, client:horse, notes,
         createdAt:new Date()
-    };
-    await addDoc(collection(db,'bookings'),data);
+    });
+
     sendEmail(EJS.confirm,{
         to_email:me, horse, service:SVC[selSvc].name,
-        date:selStart.date, time_start:selStart.time,
-        time_end:TIMES[tidx(selEnd.time)+1]||selEnd.time,
+        date:ds, time_start:tStart,
+        time_end:TIMES[tidx(tEnd)+1]||tEnd,
         notes:notes||'не указан'
     });
-    alert('Запись добавлена! Подтверждение отправлено на '+me);
+
+    hint('Запись добавлена! Подтверждение отправлено на '+me);
     resetSel();
 }
 
@@ -482,13 +468,13 @@ async function cancelBooking(id){
     const lbl=isAdmin?'Удалить запись и уведомить клиента?':'Отменить запись?';
     if(!confirm(lbl)) return;
     const b=bookings.find(x=>x.id===id);
-    console.log('cancelBooking: found booking', b, 'isAdmin', isAdmin);
     await deleteDoc(doc(db,'bookings',id));
-    if(isAdmin&&b){
-        console.log('Sending cancel email to', b.email);
+    if(isAdmin && b){
         sendEmail(EJS.cancel,{
-            to_email:b.email, horse:b.client, service:SVC[b.service]?.name||b.service,
-            date:b.date, time_start:b.timeStart||b.time,
+            to_email:b.email, horse:b.client,
+            service:SVC[b.service]?.name||b.service,
+            date:b.date,
+            time_start:b.timeStart||b.time,
             time_end:TIMES[tidx(b.timeEnd||b.time)+1]||(b.timeEnd||b.time),
             notes:b.notes||'не указан'
         });
@@ -496,7 +482,7 @@ async function cancelBooking(id){
 }
 
 function resetSel(){
-    selStart=selEnd=null; selSvc=null; selectedSlots=[];
+    selectedSlots=[]; selSvc=null;
     document.getElementById('formCard').style.display='none';
     document.getElementById('commentsCard').style.display='none';
     hint('Шаг 1 — выберите услугу');
@@ -512,8 +498,8 @@ function showComments(key){
     document.getElementById('commentsList').innerHTML=rows.map(b=>`
         <div class="booking-item">
             <div><b>${b.client}</b> · ${SVC[b.service]?.name||b.service}
-            · ${b.timeStart||b.time} – ${TIMES[tidx(b.timeEnd||b.time)+1]||(b.timeEnd||b.time)}<br>
-            ${b.notes&&b.notes.trim()?`<span style="color:#555;font-size:.9rem">💬 ${b.notes.trim()}</span>`:''}
+            · ${b.timeStart||b.time} – ${TIMES[tidx(b.timeEnd||b.time)+1]||(b.timeEnd||b.time)}
+            ${b.notes&&b.notes.trim()?`<br><span style="color:#555;font-size:.9rem">💬 ${b.notes.trim()}</span>`:''}
             </div>
         </div>`).join('');
     const card=document.getElementById('commentsCard');
@@ -527,7 +513,7 @@ function renderMyBookings(){
     const el=document.getElementById('myBookings');
     if(!email){ el.innerHTML='<p style="color:#999">Введите email чтобы увидеть свои записи</p>'; return; }
     const mine=bookings.filter(b=>b.email===email)
-        .sort((a,b)=>(a.date+a.timeStart).localeCompare(b.date+b.timeStart));
+        .sort((a,b)=>(a.date+(a.timeStart||a.time)).localeCompare(b.date+(b.timeStart||b.time)));
     if(!mine.length){ el.innerHTML='<p style="color:#999">Нет активных записей</p>'; return; }
     el.innerHTML=mine.map(b=>{
         const ts=b.timeStart||b.time, te=b.timeEnd||b.time;
@@ -535,7 +521,7 @@ function renderMyBookings(){
         return `<div class="booking-item">
             <div><b>${b.date} ${ts} – ${TIMES[tidx(te)+1]||te}</b> (${dur} мин)<br>
             ${SVC[b.service]?.name||b.service}
-            ${b.notes?`<br><span style="color:#666;font-size:.85rem">💬 ${b.notes}</span>`:''}
+            ${b.notes&&b.notes.trim()?`<br><span style="color:#666;font-size:.85rem">💬 ${b.notes.trim()}</span>`:''}
             </div>
             <button class="btn-danger" data-cancel="${b.id}">Отменить</button>
         </div>`;
@@ -557,7 +543,7 @@ function renderAdmin(){
             <div style="flex:1">
                 <b>${b.date} ${ts} – ${TIMES[tidx(te)+1]||te}</b> (${dur} мин) · ${SVC[b.service]?.name||b.service}<br>
                 <span style="color:#444">${b.client} &lt;${b.email}&gt;</span><br>
-                <span style="color:#666;font-size:.85rem">💬 <span id="n-${b.id}">${b.notes&&b.notes.trim()||'—'}</span></span>
+                <span style="color:#666;font-size:.85rem">💬 ${b.notes&&b.notes.trim()||'—'}</span>
             </div>
             <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
                 <button class="btn-danger" data-cancel="${b.id}">Удалить</button>
@@ -589,20 +575,23 @@ onSnapshot(query(collection(db,'bookings'),where('date','>=',todayStr())),snap=>
 document.getElementById('svcGrid').addEventListener('click',e=>{
     const btn=e.target.closest('.svc-btn');
     if(!btn) return;
-    selSvc=btn.dataset.svc;
-    selStart=selEnd=null; selectedSlots=[];
+    selSvc=btn.dataset.svc; selectedSlots=[];
     document.getElementById('formCard').style.display='none';
-    hint(`Шаг 2 — выберите начало записи (${SVC[selSvc].name})`);
+    hint(`Шаг 2 — выберите слоты (${SVC[selSvc].name})`);
     renderSvc(); renderCal();
 });
 
 document.getElementById('prevWeek').addEventListener('click',()=>{offset--;renderCal();});
 document.getElementById('nextWeek').addEventListener('click',()=>{offset++;renderCal();});
 document.getElementById('todayBtn').addEventListener('click',()=>{offset=0;renderCal();});
+
 document.getElementById('userEmail').addEventListener('input',()=>{renderCal();renderMyBookings();});
-document.getElementById('userEmail').addEventListener('change',()=>{renderCal();renderMyBookings();});
+document.getElementById('userEmail').addEventListener('change',()=>{saveUserData();renderCal();renderMyBookings();});
+document.getElementById('userName').addEventListener('change',()=>saveUserData());
+
 document.getElementById('submitBtn').addEventListener('click',submitBooking);
 document.getElementById('cancelSelBtn').addEventListener('click',resetSel);
+
 document.getElementById('adminLink').addEventListener('click',e=>{
     e.preventDefault();
     if(isAdmin){isAdmin=false;document.getElementById('adminPanel').style.display='none';return;}
@@ -612,8 +601,10 @@ document.getElementById('adminLink').addEventListener('click',e=>{
 });
 
 // ── Старт ─────────────────────────────────────────────────────────────────────
+loadUserData();
 renderSvc();
 renderCal();
+renderMyBookings();
 
 if('serviceWorker' in navigator)
     navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(console.error);
