@@ -253,8 +253,9 @@ function cellSt(ds,time,email){
     if(myExt) return{type:'mine-ext',b:myExt};
     const oth=all.filter(b=>b.email!==email);
     if(!oth.length) return{type:'free'};
-    if(oth.some(b=>SVC[b.service]?.indiv)) return{type:'booked'};
-    const lim=Math.min(...oth.map(b=>SVC[b.service]?.limit??99));
+    // Неизвестная услуга или индивидуальная — полная блокировка
+    if(oth.some(b=>!SVC[b.service]||SVC[b.service].indiv)) return{type:'booked'};
+    const lim=Math.min(...oth.map(b=>SVC[b.service].limit));
     if(oth.length>=lim) return{type:'booked'};
     return{type:'partial',count:oth.length,limit:lim};
 }
@@ -465,11 +466,11 @@ async function submitBooking(){
 }
 
 async function cancelBooking(id){
-    const lbl=isAdmin?'Удалить запись и уведомить клиента?':'Отменить запись?';
+    const lbl=isAdmin?'Удалить запись?':'Отменить запись?';
     if(!confirm(lbl)) return;
     const b=bookings.find(x=>x.id===id);
     await deleteDoc(doc(db,'bookings',id));
-    if(isAdmin && b){
+    if(b){
         sendEmail(EJS.cancel,{
             to_email:b.email, horse:b.client,
             service:SVC[b.service]?.name||b.service,
@@ -577,7 +578,20 @@ document.getElementById('svcGrid').addEventListener('click',e=>{
     if(!btn) return;
     selSvc=btn.dataset.svc; selectedSlots=[];
     document.getElementById('formCard').style.display='none';
-    hint(`Шаг 2 — выберите слоты (${SVC[selSvc].name})`);
+    const email=document.getElementById('userEmail').value.trim().toLowerCase();
+    const today=todayStr();
+    const svc=SVC[selSvc];
+    if(email && !isAdmin){
+        const already=bookedToday(today,selSvc,email);
+        if(already>=svc.maxSlots){
+            hint(`Шаг 2 — выберите слоты (${svc.name})`);
+            setTimeout(()=>warnHint(`На сегодня лимит исчерпан: ${svc.name} — максимум ${svc.maxSlots} слот(а) в день. Выберите другую дату.`),100);
+        } else {
+            hint(`Шаг 2 — выберите слоты (${svc.name}). Доступно ещё: ${svc.maxSlots-already} слот(а)`);
+        }
+    } else {
+        hint(`Шаг 2 — выберите слоты (${svc.name})`);
+    }
     renderSvc(); renderCal();
 });
 
