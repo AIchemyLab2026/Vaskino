@@ -193,10 +193,10 @@ function sendEmail(tpl, params){
 // ── Справочник услуг ──────────────────────────────────────────────────────────
 // maxSlots: макс слотов в день на клиента; limit: макс лошадей в одном слоте
 const SVC = {
-    cord:        { name:'Корда 30 мин',             desc:'индивидуально, 1 клиент',        limit:1, indiv:true,  maxSlots:1 },
-    riding30:    { name:'Верховая езда 30 мин',      desc:'до 3 клиентов, не более 60 мин', limit:3, indiv:false, maxSlots:2 },
-    riding60:    { name:'Верховая езда 1 час',       desc:'до 3 клиентов, 2 слота сразу',   limit:3, indiv:false, maxSlots:2 },
-    active:      { name:'Активная лошадь 30 мин',    desc:'индивидуально, не более 60 мин', limit:1, indiv:true,  maxSlots:2 },
+    cord:        { name:'Корда 30 мин',             desc:'индивидуально, 1 клиент',        limit:1, indiv:true,  maxSlots:1, autoSlots:1 },
+    riding30:    { name:'Верховая езда 30 мин',      desc:'до 3 клиентов, не более 60 мин', limit:3, indiv:false, maxSlots:1, autoSlots:1 },
+    riding60:    { name:'Верховая езда 1 час',       desc:'до 3 клиентов, 2 слота сразу',   limit:3, indiv:false, maxSlots:2, autoSlots:2 },
+    active:      { name:'Активная лошадь 30 мин',    desc:'индивидуально, не более 60 мин', limit:1, indiv:true,  maxSlots:1, autoSlots:1 },
 };
 
 // ── Время ─────────────────────────────────────────────────────────────────────
@@ -389,32 +389,47 @@ function handleSel(key){
     // Сброс если другой день
     if(selectedSlots.length && selectedSlots[0].date!==ds) selectedSlots=[];
 
+    const svc=SVC[selSvc];
+    const auto=svc.autoSlots||1;
+
+    // Снять галочку если уже выбран
     const idx=selectedSlots.findIndex(s=>s.date===ds&&s.time===time);
     if(idx>=0){
-        selectedSlots.splice(idx,1);
-    } else {
-        // Проверка дневного лимита
-        const svc=SVC[selSvc];
-        const already=bookedToday(ds,selSvc,email);
-        if(!isAdmin && already+selectedSlots.length >= svc.maxSlots){
-            warnHint(`Лимит исчерпан — «${svc.name}» максимум ${svc.maxSlots} слот(а) в день.`); return;
-        }
-        if(!canBook(ds,time,time,selSvc,email)){
-            warnHint('Этот слот недоступен.'); return;
-        }
-        selectedSlots.push({date:ds,time});
-        selectedSlots.sort((a,b)=>tidx(a.time)-tidx(b.time));
-        // Проверяем непрерывность
-        const ok=selectedSlots.every((s,i)=>i===0||tidx(s.time)===tidx(selectedSlots[i-1].time)+1);
-        if(!ok){ warnHint('Выбирайте слоты подряд.'); selectedSlots.pop(); renderCal(); return; }
+        // Сбрасываем все выбранные (проще чем частично убирать)
+        selectedSlots=[];
+        document.getElementById('formCard').style.display='none';
+        hint(`Шаг 2 — выберите слоты (${svc.name})`);
+        renderCal(); return;
     }
 
-    if(selectedSlots.length===0){
-        document.getElementById('formCard').style.display='none';
-        hint(`Шаг 2 — выберите слоты (${SVC[selSvc].name})`);
-    } else {
-        showForm();
+    // Проверка дневного лимита
+    const already=bookedToday(ds,selSvc,email);
+    if(!isAdmin && already+selectedSlots.length+auto > svc.maxSlots){
+        warnHint(`Лимит исчерпан — «${svc.name}» максимум ${svc.maxSlots} слот(а) в день.`); return;
     }
+
+    // Проверяем что все auto слотов доступны
+    const fromIdx=tidx(time);
+    for(let i=0;i<auto;i++){
+        const t=TIMES[fromIdx+i];
+        if(!t){ warnHint('Недостаточно слотов до конца дня.'); return; }
+        if(!canBook(ds,t,t,selSvc,email)){ warnHint(`Слот ${t} недоступен.`); return; }
+    }
+
+    // Добавляем все нужные слоты
+    for(let i=0;i<auto;i++){
+        const t=TIMES[fromIdx+i];
+        if(!selectedSlots.some(s=>s.date===ds&&s.time===t)){
+            selectedSlots.push({date:ds,time:t});
+        }
+    }
+    selectedSlots.sort((a,b)=>tidx(a.time)-tidx(b.time));
+
+    // Проверяем непрерывность всего набора
+    const contiguous=selectedSlots.every((s,i)=>i===0||tidx(s.time)===tidx(selectedSlots[i-1].time)+1);
+    if(!contiguous){ warnHint('Слоты должны идти подряд.'); selectedSlots=selectedSlots.slice(0,selectedSlots.length-auto); renderCal(); return; }
+
+    showForm();
     renderCal();
 }
 
