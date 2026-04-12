@@ -193,10 +193,10 @@ function sendEmail(tpl, params){
 // ── Справочник услуг ──────────────────────────────────────────────────────────
 // maxSlots: макс слотов в день на клиента; limit: макс лошадей в одном слоте
 const SVC = {
-    cord:        { name:'Корда 30 мин',             desc:'индивидуально, 1 клиент',        limit:1, indiv:true,  maxSlots:2, autoSlots:1 },
-    riding30:    { name:'Верховая езда 30 мин',      desc:'до 3 клиентов, не более 60 мин', limit:3, indiv:false, maxSlots:2, autoSlots:1 },
-    riding60:    { name:'Верховая езда 1 час',       desc:'до 3 клиентов, 2 слота сразу',   limit:3, indiv:false, maxSlots:2, autoSlots:2 },
-    active:      { name:'Активная лошадь 30 мин',    desc:'индивидуально, не более 60 мин', limit:1, indiv:true,  maxSlots:2, autoSlots:1 },
+    cord:        { name:'Корда 30 мин',           desc:'индивидуально, 1 клиент',     limit:1, indiv:true,  maxSlots:1, autoSlots:1 },
+    riding30:    { name:'Верховая езда 30 мин',    desc:'до 3 клиентов',               limit:3, indiv:false, maxSlots:1, autoSlots:1 },
+    riding60:    { name:'Верховая езда 1 час',     desc:'до 3 клиентов, 2 слота сразу',limit:3, indiv:false, maxSlots:2, autoSlots:2 },
+    active:      { name:'Активная лошадь 30 мин',  desc:'индивидуально, 1 клиент',     limit:1, indiv:true,  maxSlots:1, autoSlots:1 },
 };
 
 // ── Время ─────────────────────────────────────────────────────────────────────
