@@ -267,7 +267,7 @@ function bookedToday(ds, svcKey, email){
         .reduce((sum,b)=>sum+(tidx(b.timeEnd||b.time)-tidx(b.timeStart||b.time)+1), 0);
 }
 
-function canBook(ds,tStart,tEnd,svcKey,email){
+function canBook(ds,tStart,tEnd,svcKey,email,skipUI=false){
     const svc=SVC[svcKey]; if(!svc) return false;
     const from=tidx(tStart), to=tidx(tEnd);
     if(from<0||to<0||to<from) return false;
@@ -275,8 +275,8 @@ function canBook(ds,tStart,tEnd,svcKey,email){
     // Дневной лимит (не для админа)
     if(!isAdmin){
         const already = bookedToday(ds, svcKey, email);
-        // Также учитываем уже выбранные в UI слоты
-        const inUI = selectedSlots.filter(s=>s.date===ds).length;
+        // inUI — слоты выбранные в UI но ещё не сохранённые (не учитываем при финальной проверке)
+        const inUI = skipUI ? 0 : selectedSlots.filter(s=>s.date===ds).length;
         const want = to - from + 1;
         if(already + inUI + want > svc.maxSlots) return false;
     }
@@ -459,7 +459,7 @@ async function submitBooking(){
     const tEnd  =selectedSlots[selectedSlots.length-1].time;
     const ds    =selectedSlots[0].date;
 
-    if(!canBook(ds,tStart,tEnd,selSvc,me)){ warnHint('Слот занят. Выберите другое время.'); return; }
+    if(!canBook(ds,tStart,tEnd,selSvc,me,true)){ warnHint('Слот занят. Выберите другое время.'); return; }
 
     saveUserData();
 
