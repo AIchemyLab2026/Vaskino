@@ -220,7 +220,7 @@ function isPast(ds,t){
 }
 
 // ── Состояние ─────────────────────────────────────────────────────────────────
-let bookings=[], offset=0, isAdmin=false;
+let bookings=[], allBookings=[], offset=0, isAdmin=false, isSuperAdmin=false;
 let selSvc=null, selectedSlots=[];
 
 // ── LocalStorage — запоминаем email и кличку ──────────────────────────────────
@@ -549,8 +549,9 @@ function renderMyBookings(){
 // ── Админ ─────────────────────────────────────────────────────────────────────
 function renderAdmin(){
     document.getElementById('adminPanel').style.display='block';
+    const src=isSuperAdmin ? allBookings : bookings;
     const el=document.getElementById('adminList');
-    const sorted=[...bookings].sort((a,b)=>(a.date+(a.timeStart||a.time)).localeCompare(b.date+(b.timeStart||b.time)));
+    const sorted=[...src].sort((a,b)=>(a.date+(a.timeStart||a.time)).localeCompare(b.date+(b.timeStart||b.time)));
     if(!sorted.length){ el.innerHTML='<p style="color:#999">Записей нет</p>'; return; }
     el.innerHTML=sorted.map(b=>{
         const ts=b.timeStart||b.time, te=b.timeEnd||b.time;
@@ -579,13 +580,24 @@ function renderAdmin(){
         }));
 }
 
-// ── Firebase listener ─────────────────────────────────────────────────────────
+// ── Firebase listeners ───────────────────────────────────────────────────────
+// Обычный listener — записи от сегодня (для календаря и клиентов)
 onSnapshot(query(collection(db,'bookings'),where('date','>=',todayStr())),snap=>{
     bookings=snap.docs.map(d=>({id:d.id,...d.data()}));
     renderCal();
     renderMyBookings();
-    if(isAdmin) renderAdmin();
+    if(isAdmin && !isSuperAdmin) renderAdmin();
 });
+
+// Суперадмин listener — все записи (включая прошлые)
+let superUnsub=null;
+function startSuperListener(){
+    if(superUnsub) return;
+    superUnsub=onSnapshot(collection(db,'bookings'),snap=>{
+        allBookings=snap.docs.map(d=>({id:d.id,...d.data()}));
+        if(isSuperAdmin) renderAdmin();
+    });
+}
 
 // ── События ───────────────────────────────────────────────────────────────────
 document.getElementById('svcGrid').addEventListener('click',e=>{
@@ -623,10 +635,36 @@ document.getElementById('cancelSelBtn').addEventListener('click',resetSel);
 
 document.getElementById('adminLink').addEventListener('click',e=>{
     e.preventDefault();
-    if(isAdmin){isAdmin=false;document.getElementById('adminPanel').style.display='none';return;}
-    const p=prompt('Пароль:');
-    if(p==='admin-ksk_2026'){isAdmin=true;renderAdmin();}
-    else if(p!==null) alert('Неверный пароль');
+    // Выход
+    if(isAdmin){
+        isAdmin=false; isSuperAdmin=false;
+        document.getElementById('adminPanel').style.display='none';
+        document.getElementById('adminLink').textContent='Админ';
+        return;
+    }
+    const login=prompt('Логин:');
+    if(login===null) return;
+    const pass=prompt('Пароль:');
+    if(pass===null) return;
+
+    if(login==='Developer' && pass==='Vaskino@@2026'){
+        isAdmin=true; isSuperAdmin=true;
+        document.getElementById('adminLink').textContent='Выйти (Dev)';
+        startSuperListener();
+        // allBookings может ещё не загрузиться — рендерим когда придут данные
+        if(allBookings.length) renderAdmin();
+    } else if(login==='' && pass==='admin-ksk_2026'){
+        // Обычный админ — логин пустой (совместимость) или просто пароль
+        isAdmin=true; isSuperAdmin=false;
+        document.getElementById('adminLink').textContent='Выйти (Адм)';
+        renderAdmin();
+    } else if(pass==='admin-ksk_2026'){
+        isAdmin=true; isSuperAdmin=false;
+        document.getElementById('adminLink').textContent='Выйти (Адм)';
+        renderAdmin();
+    } else {
+        alert('Неверные данные');
+    }
 });
 
 // ── Старт ─────────────────────────────────────────────────────────────────────
