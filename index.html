@@ -193,11 +193,16 @@ function sendEmail(tpl, params){
 // ── Справочник услуг ──────────────────────────────────────────────────────────
 // maxSlots: макс слотов в день на клиента; limit: макс лошадей в одном слоте
 const SVC = {
-    cord:        { name:'Корда 30 мин',           desc:'индивидуально, 1 клиент',     limit:1, indiv:true,  maxSlots:1, autoSlots:1 },
-    riding30:    { name:'Верховая езда 30 мин',    desc:'до 3 клиентов',               limit:3, indiv:false, maxSlots:1, autoSlots:1 },
-    riding60:    { name:'Верховая езда 1 час',     desc:'до 3 клиентов, 2 слота сразу',limit:3, indiv:false, maxSlots:2, autoSlots:2 },
-    active:      { name:'Активная лошадь 30 мин',  desc:'индивидуально, 1 клиент',     limit:1, indiv:true,  maxSlots:1, autoSlots:1 },
+    cord:        { name:'Корда 30 мин',           desc:'индивидуально, 1 клиент',      limit:1, indiv:true,  maxSlots:1, adminMaxSlots:2, autoSlots:1 },
+    riding30:    { name:'Верховая езда 30 мин',    desc:'до 3 клиентов',                limit:3, indiv:false, maxSlots:1, adminMaxSlots:1, autoSlots:1 },
+    riding60:    { name:'Верховая езда 1 час',     desc:'до 3 клиентов, 2 слота сразу', limit:3, indiv:false, maxSlots:2, adminMaxSlots:2, autoSlots:2 },
+    active:      { name:'Активная лошадь 30 мин',  desc:'индивидуально, 1 клиент',      limit:1, indiv:true,  maxSlots:1, adminMaxSlots:2, autoSlots:1 },
 };
+
+function getMaxSlots(svcKey){
+    const svc=SVC[svcKey]; if(!svc) return 1;
+    return isAdmin ? (svc.adminMaxSlots||svc.maxSlots) : svc.maxSlots;
+}
 
 // ── Время ─────────────────────────────────────────────────────────────────────
 const TIMES = [];
@@ -278,7 +283,7 @@ function canBook(ds,tStart,tEnd,svcKey,email,skipUI=false){
         // inUI — слоты выбранные в UI но ещё не сохранённые (не учитываем при финальной проверке)
         const inUI = skipUI ? 0 : selectedSlots.filter(s=>s.date===ds).length;
         const want = to - from + 1;
-        if(already + inUI + want > svc.maxSlots) return false;
+        if(already + inUI + want > getMaxSlots(svcKey)) return false;
     }
 
     for(let i=from;i<=to;i++){
@@ -404,8 +409,8 @@ function handleSel(key){
 
     // Проверка дневного лимита
     const already=bookedToday(ds,selSvc,email);
-    if(!isAdmin && already+selectedSlots.length+auto > svc.maxSlots){
-        warnHint(`Лимит исчерпан — «${svc.name}» максимум ${svc.maxSlots} слот(а) в день.`); return;
+    if(!isAdmin && already+selectedSlots.length+auto > getMaxSlots(selSvc)){
+        warnHint(`Лимит исчерпан — «${svc.name}» максимум ${getMaxSlots(selSvc)} слот(а) в день.`); return;
     }
 
     // Проверяем что все auto слотов доступны
@@ -483,7 +488,7 @@ async function submitBooking(){
 async function cancelBooking(id){
     const lbl=isAdmin?'Удалить запись?':'Отменить запись?';
     if(!confirm(lbl)) return;
-    const b=bookings.find(x=>x.id===id);
+    const b=bookings.find(x=>x.id===id)||allBookings.find(x=>x.id===id);
     await deleteDoc(doc(db,'bookings',id));
     if(b){
         sendEmail(EJS.cancel,{
@@ -610,11 +615,11 @@ document.getElementById('svcGrid').addEventListener('click',e=>{
     const svc=SVC[selSvc];
     if(email && !isAdmin){
         const already=bookedToday(today,selSvc,email);
-        if(already>=svc.maxSlots){
+        if(!isAdmin && already>=getMaxSlots(selSvc)){
             hint(`Шаг 2 — выберите слоты (${svc.name})`);
             setTimeout(()=>warnHint(`На сегодня лимит исчерпан: ${svc.name} — максимум ${svc.maxSlots} слот(а) в день. Выберите другую дату.`),100);
         } else {
-            hint(`Шаг 2 — выберите слоты (${svc.name}). Доступно ещё: ${svc.maxSlots-already} слот(а)`);
+            hint(`Шаг 2 — выберите слоты (${svc.name}). Доступно ещё: ${getMaxSlots(selSvc)-already} слот(а)`);
         }
     } else {
         hint(`Шаг 2 — выберите слоты (${svc.name})`);
