@@ -245,15 +245,29 @@ function occupied(b){
 function covering(ds,time){ return bookings.filter(b=>b.date===ds&&occupied(b).includes(time)); }
 
 // Проверяет: есть ли у клиента соседняя запись (30-минутной услуги) на (ds, time)
-function hasAdjacentBooking(ds, time, email){
+// Учитывает и уже существующие брони, и выбранные сейчас слоты
+function hasAdjacentBooking(ds, time, email, includeSelected=true){
     const idx=tidx(time);
     const prev=TIMES[idx-1], next=TIMES[idx+1];
-    return bookings.some(b=>{
+    
+    // Проверяем существующие брони
+    const hasExisting = bookings.some(b=>{
         if(b.date!==ds || b.email!==email) return false;
-        if(b.service==='riding60') return false; // 1 час не считается соседним
+        if(b.service==='riding60') return false;
         const bTimes=occupied(b);
         return (prev && bTimes.includes(prev)) || (next && bTimes.includes(next));
     });
+    if(hasExisting) return true;
+    
+    // Проверяем выбранные сейчас слоты
+    if(includeSelected && selectedSlots.length>0){
+        const selectedInSameDay = selectedSlots.filter(s=>s.date===ds);
+        for(const sel of selectedInSameDay){
+            const selIdx = tidx(sel.time);
+            if(Math.abs(idx - selIdx) === 1) return true;
+        }
+    }
+    return false;
 }
 
 function cellSt(ds,time,email){
@@ -436,11 +450,23 @@ function handleSel(key){
         renderCal(); return;
     }
 
+    // Проверка: нельзя выбирать соседний с уже выбранным (для 30-минутных)
+    if(!isAdmin && selSvc!=='riding60' && selectedSlots.length>0){
+        const newIdx = tidx(time);
+        for(const sel of selectedSlots){
+            const selIdx = tidx(sel.time);
+            // Если новый слот соседний с любым уже выбранным (до или после)
+            if(Math.abs(newIdx - selIdx) === 1){
+                warnHint(`Нельзя бронировать два слота подряд.`); return;
+            }
+        }
+    }
+
     // Проверка соседних слотов для 30-минутных услуг (кроме riding60)
     if(!isAdmin && selSvc!=='riding60'){
         for(let i=0; i<auto; i++){
             const t=TIMES[tidx(time)+i];
-            if(t && hasAdjacentBooking(ds, t, email)){
+            if(t && hasAdjacentBooking(ds, t, email, true)){
                 warnHint(`Нельзя бронировать два слота подряд.`); return;
             }
         }
@@ -463,7 +489,7 @@ function handleSel(key){
     }
     selectedSlots.sort((a,b)=>tidx(a.time)-tidx(b.time));
 
-    // Проверяем непрерывность всего набора
+    // Проверяем непрерывность всего набора (для riding60)
     const contiguous=selectedSlots.every((s,i)=>i===0||tidx(s.time)===tidx(selectedSlots[i-1].time)+1);
     if(!contiguous){ warnHint('Слоты должны идти подряд.'); selectedSlots=[]; renderCal(); return; }
 
