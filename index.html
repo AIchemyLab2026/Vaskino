@@ -191,27 +191,12 @@ function sendEmail(tpl, params){
 }
 
 // ── Справочник услуг ──────────────────────────────────────────────────────────
-// limit: макс лошадей в одном слоте; indiv: индивидуальная (1 клиент)
 const SVC = {
     cord:     { name:'Корда 30 мин',           desc:'индивидуально, 1 клиент',      limit:1, indiv:true,  autoSlots:1 },
     riding30: { name:'Верховая езда 30 мин',    desc:'до 3 клиентов',                limit:3, indiv:false, autoSlots:1 },
     riding60: { name:'Верховая езда 1 час',     desc:'до 3 клиентов, 2 слота сразу', limit:3, indiv:false, autoSlots:2 },
     active:   { name:'Активная лошадь 30 мин',  desc:'индивидуально, 1 клиент',      limit:1, indiv:true,  autoSlots:1 },
 };
-
-// Проверяет: есть ли у клиента соседняя запись (любой услуги с noConsecutive) на (ds, time)
-function hasAdjacentBooking(ds, time, email){
-    const idx=tidx(time);
-    const prev=TIMES[idx-1], next=TIMES[idx+1];
-    // Проверяем соседние слоты на наличие моих записей услуг с noConsecutive
-    return bookings.some(b=>{
-        if(b.date!==ds || b.email!==email) return false;
-        // Все 30-минутные услуги имеют noConsecutive (кроме riding60, но она autoSlots:2)
-        if(b.service==='riding60') return false; // 1 час не мешает соседним
-        const bTimes=occupied(b);
-        return (prev && bTimes.includes(prev)) || (next && bTimes.includes(next));
-    });
-}
 
 // ── Время ─────────────────────────────────────────────────────────────────────
 const TIMES = [];
@@ -259,8 +244,22 @@ function occupied(b){
 
 function covering(ds,time){ return bookings.filter(b=>b.date===ds&&occupied(b).includes(time)); }
 
+// Проверяет: есть ли у клиента соседняя запись (30-минутной услуги) на (ds, time)
+function hasAdjacentBooking(ds, time, email){
+    const idx=tidx(time);
+    const prev=TIMES[idx-1], next=TIMES[idx+1];
+    return bookings.some(b=>{
+        if(b.date!==ds || b.email!==email) return false;
+        if(b.service==='riding60') return false; // 1 час не считается соседним
+        const bTimes=occupied(b);
+        return (prev && bTimes.includes(prev)) || (next && bTimes.includes(next));
+    });
+}
+
 function cellSt(ds,time,email){
     const all=covering(ds,time);
+    
+    // Сначала проверяем: есть ли моя запись в ЭТОМ слоте
     const myAll=all.filter(b=>b.email===email);
     const myDir=myAll.find(b=>(b.timeStart||b.time)===time);
     const myExt=myAll.find(b=>(b.timeStart||b.time)!==time);
@@ -268,24 +267,34 @@ function cellSt(ds,time,email){
     if(myExt) return{type:'mine-ext',b:myExt};
     
     const oth=all.filter(b=>b.email!==email);
-    if(!oth.length) return{type:'free'};
     
-    // Если выбрана услуга и это индивидуальная - проверяем limit
+    // Если выбрана услуга - проверяем можно ли бронировать
     if(selSvc){
         const svc=SVC[selSvc];
-        // Для индивидуальных услуг (cord, active): если кто-то есть - занято
-        if(svc.indiv) return{type:'booked'};
-        // Для групповых: проверяем лимит
+        
+        // Для индивидуальных услуг (cord, active): слот должен быть совсем пуст
+        if(svc.indiv){
+            if(oth.length>0) return{type:'booked'};
+            // Проверяем соседние слоты (нельзя бронировать подряд)
+            if(email && hasAdjacentBooking(ds, time, email)) return{type:'unavail'};
+            return{type:'free'};
+        }
+        
+        // Для групповых (riding30): проверяем лимит и соседние
         const lim=Math.min(svc.limit, ...oth.map(b=>SVC[b.service]?.limit||99));
         if(oth.length>=lim) return{type:'booked'};
-        return{type:'partial',count:oth.length,limit:lim};
+        // Проверяем соседние слоты (нельзя бронировать подряд)
+        if(email && hasAdjacentBooking(ds, time, email)) return{type:'unavail'};
+        if(oth.length>0) return{type:'partial',count:oth.length,limit:lim};
+        return{type:'free'};
     }
     
-    // Без выбранной услуги - показываем статус
+    // Без выбранной услуги - просто показываем статус
     if(oth.some(b=>SVC[b.service]?.indiv)) return{type:'booked'};
     const lim=Math.min(...oth.map(b=>SVC[b.service]?.limit||99));
     if(oth.length>=lim) return{type:'booked'};
-    return{type:'partial',count:oth.length,limit:lim};
+    if(oth.length>0) return{type:'partial',count:oth.length,limit:lim};
+    return{type:'free'};
 }
 
 function canBook(ds,tStart,tEnd,svcKey,email,skipUI=false){
@@ -293,7 +302,7 @@ function canBook(ds,tStart,tEnd,svcKey,email,skipUI=false){
     const from=tidx(tStart), to=tidx(tEnd);
     if(from<0||to<0||to<from) return false;
 
-    // Проверка соседних слотов для всех 30-минутных услуг (кроме админа)
+    // Для 30-минутных услуг проверяем соседние слоты (кроме админа)
     if(!isAdmin && svcKey!=='riding60'){
         for(let i=from; i<=to; i++){
             if(hasAdjacentBooking(ds, TIMES[i], email)) return false;
@@ -383,6 +392,8 @@ function renderCal(){
             if(isSel){ body+=`<td><div class="slot selecting" data-sel="${ds}|${time}">✓</div></td>`; return; }
 
             if(st.type==='booked'){ body+=`<td><div class="slot booked" data-view="${ds}|${time}">✕</div></td>`; return; }
+            
+            if(st.type==='unavail'){ body+=`<td><div class="slot unavail"></div></td>`; return; }
 
             const ok=canBook(ds,time,time,selSvc,email);
             if(ok)                       body+=`<td><div class="slot avail" data-sel="${ds}|${time}"></div></td>`;
