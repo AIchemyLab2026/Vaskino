@@ -32,12 +32,12 @@ header{position:fixed;top:0;width:100%;background:var(--g800);color:var(--white)
 .nav-btn:hover{background:var(--g50)}
 .cal-wrap{overflow-x:auto;border:1px solid var(--g100);border-radius:8px}
 table.cal{border-collapse:collapse;min-width:100%;table-layout:fixed}
-table.cal th,table.cal td{border:1px solid var(--g100);text-align:center;font-size:.75rem;padding:0;white-space:nowrap}
+table.cal th,table.cal td{border:1px solid var(--g100);text-align:center;font-size:.75rem;padding:0;white-space:nowrap;vertical-align:top}
 table.cal thead th{background:var(--g50);font-weight:600;padding:6px 4px;position:sticky;top:0;z-index:2;min-width:46px}
 table.cal thead th.day-col{width:58px;min-width:58px;position:sticky;left:0;z-index:3;background:var(--g50)}
-table.cal tbody td.day-label{position:sticky;left:0;background:white;z-index:1;font-weight:600;padding:4px 6px;border-right:2px solid var(--gold);min-width:58px;width:58px}
+table.cal tbody td.day-label{position:sticky;left:0;background:white;z-index:1;font-weight:600;padding:4px 6px;border-right:2px solid var(--gold);min-width:58px;width:58px;vertical-align:middle}
 table.cal tbody td.day-label.today{background:rgba(196,151,58,.08)}
-.slot{width:100%;height:46px;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:.15s}
+.slot{width:100%;min-height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.65rem;transition:.15s;position:relative;overflow:hidden}
 .slot.past{background:#eee;opacity:.35;pointer-events:none}
 .slot.free{background:var(--g50)}
 .slot.avail{background:#d4edda;cursor:pointer;outline:2px solid #5cb85c}.slot.avail:hover{background:#b8dfc4}
@@ -47,6 +47,11 @@ table.cal tbody td.day-label.today{background:rgba(196,151,58,.08)}
 .slot.unavail{background:#f5f5f5;color:#ccc;pointer-events:none}
 .slot.mine{background:rgba(196,151,58,.28);border:2px solid var(--gold);cursor:pointer}
 .slot.mine-ext{background:rgba(196,151,58,.13);border:2px dashed var(--gold-dk);pointer-events:none}
+.slot-seg{width:100%;flex:1;display:flex;align-items:center;justify-content:center;padding:1px 2px;min-height:14px;line-height:1.1;font-size:.6rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slot-seg:nth-child(odd){background:rgba(196,151,58,.15)}
+.slot-seg:nth-child(even){background:rgba(196,151,58,.08)}
+.slot-seg.mine-seg{background:rgba(196,151,58,.4);font-weight:600}
+.slot-seg.booked-seg{background:rgba(184,76,42,.12);color:var(--red)}
 .svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:20px}
 .svc-btn{border:2px solid var(--g100);border-radius:8px;padding:10px 12px;cursor:pointer;background:white;font-family:'Jost',sans-serif;font-size:.85rem;text-align:left;transition:.15s}
 .svc-btn:hover{border-color:var(--gold);background:var(--g50)}
@@ -65,6 +70,7 @@ input,textarea{width:100%;padding:12px;margin-bottom:15px;border:1px solid var(-
 footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;padding:40px;font-size:.9rem}
 @media(max-width:768px){.hero h1{font-size:2.5rem}}
 </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -245,12 +251,10 @@ function occupied(b){
 function covering(ds,time){ return bookings.filter(b=>b.date===ds&&occupied(b).includes(time)); }
 
 // Проверяет: есть ли у клиента соседняя запись (30-минутной услуги) на (ds, time)
-// Учитывает и уже существующие брони, и выбранные сейчас слоты
 function hasAdjacentBooking(ds, time, email, includeSelected=true){
     const idx=tidx(time);
     const prev=TIMES[idx-1], next=TIMES[idx+1];
     
-    // Проверяем существующие брони
     const hasExisting = bookings.some(b=>{
         if(b.date!==ds || b.email!==email) return false;
         if(b.service==='riding60') return false;
@@ -259,7 +263,6 @@ function hasAdjacentBooking(ds, time, email, includeSelected=true){
     });
     if(hasExisting) return true;
     
-    // Проверяем выбранные сейчас слоты
     if(includeSelected && selectedSlots.length>0){
         const selectedInSameDay = selectedSlots.filter(s=>s.date===ds);
         for(const sel of selectedInSameDay){
@@ -273,7 +276,6 @@ function hasAdjacentBooking(ds, time, email, includeSelected=true){
 function cellSt(ds,time,email){
     const all=covering(ds,time);
     
-    // Сначала проверяем: есть ли моя запись в ЭТОМ слоте
     const myAll=all.filter(b=>b.email===email);
     const myDir=myAll.find(b=>(b.timeStart||b.time)===time);
     const myExt=myAll.find(b=>(b.timeStart||b.time)!==time);
@@ -282,32 +284,24 @@ function cellSt(ds,time,email){
     
     const oth=all.filter(b=>b.email!==email);
     
-    // Если выбрана услуга - проверяем можно ли бронировать
     if(selSvc){
         const svc=SVC[selSvc];
-        
-        // Для индивидуальных услуг (cord, active): слот должен быть совсем пуст
         if(svc.indiv){
-            if(oth.length>0) return{type:'booked'};
-            // Проверяем соседние слоты (нельзя бронировать подряд)
+            if(oth.length>0) return{type:'booked',bookings:all};
             if(email && hasAdjacentBooking(ds, time, email)) return{type:'unavail'};
             return{type:'free'};
         }
-        
-        // Для групповых (riding30): проверяем лимит и соседние
         const lim=Math.min(svc.limit, ...oth.map(b=>SVC[b.service]?.limit||99));
-        if(oth.length>=lim) return{type:'booked'};
-        // Проверяем соседние слоты (нельзя бронировать подряд)
+        if(oth.length>=lim) return{type:'booked',bookings:all};
         if(email && hasAdjacentBooking(ds, time, email)) return{type:'unavail'};
-        if(oth.length>0) return{type:'partial',count:oth.length,limit:lim};
+        if(oth.length>0) return{type:'partial',count:oth.length,limit:lim,bookings:all};
         return{type:'free'};
     }
     
-    // Без выбранной услуги - просто показываем статус
-    if(oth.some(b=>SVC[b.service]?.indiv)) return{type:'booked'};
+    if(oth.some(b=>SVC[b.service]?.indiv)) return{type:'booked',bookings:all};
     const lim=Math.min(...oth.map(b=>SVC[b.service]?.limit||99));
-    if(oth.length>=lim) return{type:'booked'};
-    if(oth.length>0) return{type:'partial',count:oth.length,limit:lim};
+    if(oth.length>=lim) return{type:'booked',bookings:all};
+    if(oth.length>0) return{type:'partial',count:oth.length,limit:lim,bookings:all};
     return{type:'free'};
 }
 
@@ -316,7 +310,6 @@ function canBook(ds,tStart,tEnd,svcKey,email,skipUI=false){
     const from=tidx(tStart), to=tidx(tEnd);
     if(from<0||to<0||to<from) return false;
 
-    // Для 30-минутных услуг проверяем соседние слоты (кроме админа)
     if(!isAdmin && svcKey!=='riding60'){
         for(let i=from; i<=to; i++){
             if(hasAdjacentBooking(ds, TIMES[i], email)) return false;
@@ -328,11 +321,9 @@ function canBook(ds,tStart,tEnd,svcKey,email,skipUI=false){
         if(!t||isPast(ds,t)) return false;
         const oth=covering(ds,t).filter(b=>b.email!==email);
         
-        // Для индивидуальных услуг (cord, active): слот должен быть пуст
         if(svc.indiv){
             if(oth.length>0) return false;
         } else {
-            // Для групповых: проверяем лимит
             if(oth.some(b=>SVC[b.service]?.indiv)) return false;
             const lim=Math.min(svc.limit, ...oth.map(b=>SVC[b.service]?.limit||99));
             if(oth.length>=lim) return false;
@@ -363,6 +354,27 @@ function renderSvc(){
         ).join('');
 }
 
+// Формирует HTML с сегментами для слота с бронированиями
+function renderSlotSegments(bookings, email, type){
+    if(!bookings || bookings.length===0) return '';
+    
+    // Сортируем: сначала мои, потом чужие
+    const sorted = [...bookings].sort((a,b)=>{
+        const aMine = a.email===email;
+        const bMine = b.email===email;
+        if(aMine && !bMine) return -1;
+        if(!aMine && bMine) return 1;
+        return 0;
+    });
+    
+    return sorted.map(b=>{
+        const isMine = b.email===email;
+        const cls = isMine ? 'slot-seg mine-seg' : 'slot-seg booked-seg';
+        const text = b.client + (b.notes && b.notes.trim() ? ` · ${b.notes.trim()}` : '');
+        return `<div class="${cls}" title="${text}">${text}</div>`;
+    }).join('');
+}
+
 // ── Рендер календаря ─────────────────────────────────────────────────────────
 function renderCal(){
     const mon=getMonday(addDays(new Date(),offset*7));
@@ -387,31 +399,43 @@ function renderCal(){
             const st=cellSt(ds,time,email);
 
             if(st.type==='mine'){
+                const segs = renderSlotSegments([st.b], email, 'mine');
                 const tip=SVC[st.b.service]?.name||st.b.service;
-                body+=`<td><div class="slot mine" data-cancel="${st.b.id}" title="${tip}${st.b.notes?' · '+st.b.notes:''}">✓</div></td>`; return;
+                body+=`<td><div class="slot mine" data-cancel="${st.b.id}" title="${tip}">${segs}</div></td>`; return;
             }
             if(st.type==='mine-ext'){
                 body+=`<td><div class="slot mine-ext">+</div></td>`; return;
             }
 
             if(!selSvc){
-                if(st.type==='booked')        body+=`<td><div class="slot booked" data-view="${ds}|${time}">✕</div></td>`;
-                else if(st.type==='partial')  body+=`<td><div class="slot partial" data-view="${ds}|${time}">${st.count}/${st.limit}</div></td>`;
-                else                          body+=`<td><div class="slot free"></div></td>`;
+                if(st.type==='booked'){
+                    const segs = renderSlotSegments(st.bookings, email, 'booked');
+                    body+=`<td><div class="slot booked" data-view="${ds}|${time}">${segs}</div></td>`;
+                }
+                else if(st.type==='partial'){
+                    const segs = renderSlotSegments(st.bookings, email, 'partial');
+                    body+=`<td><div class="slot partial" data-view="${ds}|${time}">${segs}</div></td>`;
+                }
+                else body+=`<td><div class="slot free"></div></td>`;
                 return;
             }
 
-            // Режим выбора
             const isSel=selectedSlots.some(s=>s.date===ds&&s.time===time);
             if(isSel){ body+=`<td><div class="slot selecting" data-sel="${ds}|${time}">✓</div></td>`; return; }
 
-            if(st.type==='booked'){ body+=`<td><div class="slot booked" data-view="${ds}|${time}">✕</div></td>`; return; }
+            if(st.type==='booked'){
+                const segs = renderSlotSegments(st.bookings, email, 'booked');
+                body+=`<td><div class="slot booked" data-view="${ds}|${time}">${segs}</div></td>`; return;
+            }
             
             if(st.type==='unavail'){ body+=`<td><div class="slot unavail"></div></td>`; return; }
 
             const ok=canBook(ds,time,time,selSvc,email);
             if(ok)                       body+=`<td><div class="slot avail" data-sel="${ds}|${time}"></div></td>`;
-            else if(st.type==='partial') body+=`<td><div class="slot unavail" data-view="${ds}|${time}">${st.count}/${st.limit}</div></td>`;
+            else if(st.type==='partial'){
+                const segs = renderSlotSegments(st.bookings, email, 'partial');
+                body+=`<td><div class="slot unavail" data-view="${ds}|${time}">${segs}</div></td>`;
+            }
             else                         body+=`<td><div class="slot unavail"></div></td>`;
         });
         body+='</tr>';
@@ -435,13 +459,11 @@ function handleSel(key){
 
     if(!email){ warnHint('Сначала введите email'); return; }
 
-    // Сброс если другой день
     if(selectedSlots.length && selectedSlots[0].date!==ds) selectedSlots=[];
 
     const svc=SVC[selSvc];
     const auto=svc.autoSlots||1;
 
-    // Снять галочку если уже выбран
     const idx=selectedSlots.findIndex(s=>s.date===ds&&s.time===time);
     if(idx>=0){
         selectedSlots=[];
@@ -450,19 +472,16 @@ function handleSel(key){
         renderCal(); return;
     }
 
-    // Проверка: нельзя выбирать соседний с уже выбранным (для 30-минутных)
     if(!isAdmin && selSvc!=='riding60' && selectedSlots.length>0){
         const newIdx = tidx(time);
         for(const sel of selectedSlots){
             const selIdx = tidx(sel.time);
-            // Если новый слот соседний с любым уже выбранным (до или после)
             if(Math.abs(newIdx - selIdx) === 1){
                 warnHint(`Нельзя бронировать два слота подряд.`); return;
             }
         }
     }
 
-    // Проверка соседних слотов для 30-минутных услуг (кроме riding60)
     if(!isAdmin && selSvc!=='riding60'){
         for(let i=0; i<auto; i++){
             const t=TIMES[tidx(time)+i];
@@ -472,7 +491,6 @@ function handleSel(key){
         }
     }
 
-    // Проверяем что все auto слотов доступны
     const fromIdx=tidx(time);
     for(let i=0;i<auto;i++){
         const t=TIMES[fromIdx+i];
@@ -480,7 +498,6 @@ function handleSel(key){
         if(!canBook(ds,t,t,selSvc,email)){ warnHint(`Слот ${t} недоступен.`); return; }
     }
 
-    // Добавляем все нужные слоты
     for(let i=0;i<auto;i++){
         const t=TIMES[fromIdx+i];
         if(!selectedSlots.some(s=>s.date===ds&&s.time===t)){
@@ -489,7 +506,6 @@ function handleSel(key){
     }
     selectedSlots.sort((a,b)=>tidx(a.time)-tidx(b.time));
 
-    // Проверяем непрерывность всего набора (для riding60)
     const contiguous=selectedSlots.every((s,i)=>i===0||tidx(s.time)===tidx(selectedSlots[i-1].time)+1);
     if(!contiguous){ warnHint('Слоты должны идти подряд.'); selectedSlots=[]; renderCal(); return; }
 
