@@ -32,12 +32,12 @@ header{position:fixed;top:0;width:100%;background:var(--g800);color:var(--white)
 .nav-btn:hover{background:var(--g50)}
 .cal-wrap{overflow-x:auto;border:1px solid var(--g100);border-radius:8px}
 table.cal{border-collapse:collapse;min-width:100%;table-layout:fixed}
-table.cal th,table.cal td{border:1px solid var(--g100);text-align:center;font-size:.75rem;padding:0;white-space:nowrap;vertical-align:top}
+table.cal th,table.cal td{border:1px solid var(--g100);text-align:center;font-size:.75rem;padding:0;white-space:nowrap}
 table.cal thead th{background:var(--g50);font-weight:600;padding:6px 4px;position:sticky;top:0;z-index:2;min-width:46px}
 table.cal thead th.day-col{width:58px;min-width:58px;position:sticky;left:0;z-index:3;background:var(--g50)}
-table.cal tbody td.day-label{position:sticky;left:0;background:white;z-index:1;font-weight:600;padding:4px 6px;border-right:2px solid var(--gold);min-width:58px;width:58px;vertical-align:middle}
+table.cal tbody td.day-label{position:sticky;left:0;background:white;z-index:1;font-weight:600;padding:4px 6px;border-right:2px solid var(--gold);min-width:58px;width:58px}
 table.cal tbody td.day-label.today{background:rgba(196,151,58,.08)}
-.slot{width:100%;min-height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.65rem;transition:.15s;position:relative;overflow:hidden}
+.slot{width:100%;height:46px;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:.15s}
 .slot.past{background:#eee;opacity:.35;pointer-events:none}
 .slot.free{background:var(--g50)}
 .slot.avail{background:#d4edda;cursor:pointer;outline:2px solid #5cb85c}.slot.avail:hover{background:#b8dfc4}
@@ -45,13 +45,8 @@ table.cal tbody td.day-label.today{background:rgba(196,151,58,.08)}
 .slot.booked{background:rgba(184,76,42,.15);color:var(--red);pointer-events:none}
 .slot.partial{background:rgba(196,151,58,.13);cursor:pointer}
 .slot.unavail{background:#f5f5f5;color:#ccc;pointer-events:none}
-.slot.mine{background:rgba(196,151,58,.28);border:2px solid var(--gold);cursor:pointer}
-.slot.mine-ext{background:rgba(196,151,58,.13);border:2px dashed var(--gold-dk);pointer-events:none}
-.slot-seg{width:100%;flex:1;display:flex;align-items:center;justify-content:center;padding:1px 2px;min-height:14px;line-height:1.1;font-size:.6rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.slot-seg:nth-child(odd){background:rgba(196,151,58,.15)}
-.slot-seg:nth-child(even){background:rgba(196,151,58,.08)}
-.slot-seg.mine-seg{background:rgba(196,151,58,.4);font-weight:600}
-.slot-seg.booked-seg{background:rgba(184,76,42,.12);color:var(--red)}
+.slot.mine{background:rgba(196,151,58,.52);border:2px solid var(--gold-dk);cursor:pointer}
+.slot.mine-ext{background:rgba(196,151,58,.32);border:2px dashed var(--gold-dk);pointer-events:none}
 .svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:20px}
 .svc-btn{border:2px solid var(--g100);border-radius:8px;padding:10px 12px;cursor:pointer;background:white;font-family:'Jost',sans-serif;font-size:.85rem;text-align:left;transition:.15s}
 .svc-btn:hover{border-color:var(--gold);background:var(--g50)}
@@ -67,10 +62,19 @@ input,textarea{width:100%;padding:12px;margin-bottom:15px;border:1px solid var(-
 #adminPanel h3{margin-top:0}
 .admin-row{border-bottom:1px solid var(--g100);padding:8px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;font-size:.85rem}
 .admin-row:last-child{border-bottom:none}
+/* Group slot segments */
+.slot-segments{width:100%;height:100%;display:flex;flex-direction:column;position:relative}
+.slot-seg{flex:1;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:600;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 2px;line-height:1}
+.slot-seg.seg-filled{background:rgba(184,76,42,.22);color:var(--red)}
+.slot-seg.seg-empty{background:rgba(92,184,92,.18);color:#3a7a3a}
+.slot-seg.seg-mine{background:rgba(196,151,58,.55);color:var(--gold-dk)}
+/* Tooltip */
+.slot[data-tip]{position:relative}
+.slot[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--g800);color:#fff;font-size:.72rem;padding:5px 8px;border-radius:5px;white-space:pre-wrap;min-width:120px;max-width:200px;text-align:left;z-index:100;pointer-events:none;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+.slot[data-tip]:hover::before{content:'';position:absolute;bottom:calc(100%);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--g800);z-index:101}
 footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;padding:40px;font-size:.9rem}
 @media(max-width:768px){.hero h1{font-size:2.5rem}}
 </style>
-<base target="_blank">
 </head>
 <body>
 
@@ -101,13 +105,20 @@ footer{background:var(--g800);color:rgba(255,255,255,.5);text-align:center;paddi
         <input type="email" id="userEmail" placeholder="email@example.com" autocomplete="email">
       </div>
       <div style="flex:1;min-width:200px">
-        <label style="font-size:.8rem;text-transform:uppercase;color:#666">Кличка лошади</label>
-        <input type="text" id="userName" placeholder="Буян, Звёздочка..." autocomplete="nickname">
+        <label style="font-size:.8rem;text-transform:uppercase;color:#666">Кличка лошади <span style="text-transform:none;font-weight:400;color:#999">(если несколько — через запятую)</span></label>
+        <input type="text" id="userName" placeholder="Буян или Буян, Звёздочка..." autocomplete="nickname">
       </div>
     </div>
 
     <div class="step-hint" id="stepHint">Шаг 1 — выберите услугу</div>
     <div class="svc-grid" id="svcGrid"></div>
+
+    <!-- Horse selector — shown only when user has multiple horses AND a service is selected -->
+    <div id="horseSelectorWrap" style="display:none;margin-bottom:16px">
+      <label style="font-size:.8rem;text-transform:uppercase;color:#666;display:block;margin-bottom:4px">Выберите лошадь для этой записи</label>
+      <select id="horseSelector" style="width:100%;max-width:320px;padding:10px 12px;border:2px solid var(--gold);border-radius:6px;font-family:'Jost',sans-serif;font-size:1rem;background:white;cursor:pointer">
+      </select>
+    </div>
 
     <div id="calSection">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;flex-wrap:wrap;gap:10px">
@@ -228,6 +239,32 @@ function isPast(ds,t){
 let bookings=[], allBookings=[], offset=0, isAdmin=false, isSuperAdmin=false;
 let selSvc=null, selectedSlots=[];
 
+// ── Horse selector helpers ────────────────────────────────────────────────────
+function getHorseList(){
+    const raw=document.getElementById('userName').value.trim();
+    if(!raw) return [];
+    return raw.split(',').map(h=>h.trim()).filter(Boolean);
+}
+function hasMultipleHorses(){ return getHorseList().length > 1; }
+function getActiveHorse(){
+    const list=getHorseList();
+    if(list.length===0) return '';
+    if(list.length===1) return list[0];
+    const sel=document.getElementById('horseSelector');
+    return sel.value || list[0];
+}
+function updateHorseSelector(){
+    const wrap=document.getElementById('horseSelectorWrap');
+    const sel=document.getElementById('horseSelector');
+    const list=getHorseList();
+    if(selSvc && list.length>1){
+        sel.innerHTML=list.map(h=>`<option value="${h}">${h}</option>`).join('');
+        wrap.style.display='block';
+    } else {
+        wrap.style.display='none';
+    }
+}
+
 // ── LocalStorage ──────────────────────────────────────────────────────────────
 function saveUserData(){
     localStorage.setItem('vaskino_email', document.getElementById('userEmail').value.trim());
@@ -251,10 +288,12 @@ function occupied(b){
 function covering(ds,time){ return bookings.filter(b=>b.date===ds&&occupied(b).includes(time)); }
 
 // Проверяет: есть ли у клиента соседняя запись (30-минутной услуги) на (ds, time)
+// Учитывает и уже существующие брони, и выбранные сейчас слоты
 function hasAdjacentBooking(ds, time, email, includeSelected=true){
     const idx=tidx(time);
     const prev=TIMES[idx-1], next=TIMES[idx+1];
     
+    // Проверяем существующие брони
     const hasExisting = bookings.some(b=>{
         if(b.date!==ds || b.email!==email) return false;
         if(b.service==='riding60') return false;
@@ -263,6 +302,7 @@ function hasAdjacentBooking(ds, time, email, includeSelected=true){
     });
     if(hasExisting) return true;
     
+    // Проверяем выбранные сейчас слоты
     if(includeSelected && selectedSlots.length>0){
         const selectedInSameDay = selectedSlots.filter(s=>s.date===ds);
         for(const sel of selectedInSameDay){
@@ -276,6 +316,7 @@ function hasAdjacentBooking(ds, time, email, includeSelected=true){
 function cellSt(ds,time,email){
     const all=covering(ds,time);
     
+    // Сначала проверяем: есть ли моя запись в ЭТОМ слоте
     const myAll=all.filter(b=>b.email===email);
     const myDir=myAll.find(b=>(b.timeStart||b.time)===time);
     const myExt=myAll.find(b=>(b.timeStart||b.time)!==time);
@@ -284,24 +325,32 @@ function cellSt(ds,time,email){
     
     const oth=all.filter(b=>b.email!==email);
     
+    // Если выбрана услуга - проверяем можно ли бронировать
     if(selSvc){
         const svc=SVC[selSvc];
+        
+        // Для индивидуальных услуг (cord, active): слот должен быть совсем пуст
         if(svc.indiv){
-            if(oth.length>0) return{type:'booked',bookings:all};
+            if(oth.length>0) return{type:'booked',horses:oth.map(b=>b.client)};
+            // Проверяем соседние слоты (нельзя бронировать подряд)
             if(email && hasAdjacentBooking(ds, time, email)) return{type:'unavail'};
             return{type:'free'};
         }
+        
+        // Для групповых (riding30): проверяем лимит и соседние
         const lim=Math.min(svc.limit, ...oth.map(b=>SVC[b.service]?.limit||99));
-        if(oth.length>=lim) return{type:'booked',bookings:all};
+        if(oth.length>=lim) return{type:'booked',horses:oth.map(b=>b.client),limit:lim};
+        // Проверяем соседние слоты (нельзя бронировать подряд)
         if(email && hasAdjacentBooking(ds, time, email)) return{type:'unavail'};
-        if(oth.length>0) return{type:'partial',count:oth.length,limit:lim,bookings:all};
-        return{type:'free'};
+        if(oth.length>0) return{type:'partial',count:oth.length,limit:lim,horses:oth.map(b=>b.client),notes:oth.map(b=>b.notes||'')};
+        return{type:'free',limit:lim};
     }
     
-    if(oth.some(b=>SVC[b.service]?.indiv)) return{type:'booked',bookings:all};
+    // Без выбранной услуги - просто показываем статус
+    if(oth.some(b=>SVC[b.service]?.indiv)) return{type:'booked',horses:oth.map(b=>b.client)};
     const lim=Math.min(...oth.map(b=>SVC[b.service]?.limit||99));
-    if(oth.length>=lim) return{type:'booked',bookings:all};
-    if(oth.length>0) return{type:'partial',count:oth.length,limit:lim,bookings:all};
+    if(oth.length>=lim) return{type:'booked',horses:oth.map(b=>b.client),limit:lim};
+    if(oth.length>0) return{type:'partial',count:oth.length,limit:lim,horses:oth.map(b=>b.client),notes:oth.map(b=>b.notes||'')};
     return{type:'free'};
 }
 
@@ -310,6 +359,7 @@ function canBook(ds,tStart,tEnd,svcKey,email,skipUI=false){
     const from=tidx(tStart), to=tidx(tEnd);
     if(from<0||to<0||to<from) return false;
 
+    // Для 30-минутных услуг проверяем соседние слоты (кроме админа)
     if(!isAdmin && svcKey!=='riding60'){
         for(let i=from; i<=to; i++){
             if(hasAdjacentBooking(ds, TIMES[i], email)) return false;
@@ -321,9 +371,11 @@ function canBook(ds,tStart,tEnd,svcKey,email,skipUI=false){
         if(!t||isPast(ds,t)) return false;
         const oth=covering(ds,t).filter(b=>b.email!==email);
         
+        // Для индивидуальных услуг (cord, active): слот должен быть пуст
         if(svc.indiv){
             if(oth.length>0) return false;
         } else {
+            // Для групповых: проверяем лимит
             if(oth.some(b=>SVC[b.service]?.indiv)) return false;
             const lim=Math.min(svc.limit, ...oth.map(b=>SVC[b.service]?.limit||99));
             if(oth.length>=lim) return false;
@@ -354,25 +406,25 @@ function renderSvc(){
         ).join('');
 }
 
-// Формирует HTML с сегментами для слота с бронированиями
-function renderSlotSegments(bookings, email, type){
-    if(!bookings || bookings.length===0) return '';
-    
-    // Сортируем: сначала мои, потом чужие
-    const sorted = [...bookings].sort((a,b)=>{
-        const aMine = a.email===email;
-        const bMine = b.email===email;
-        if(aMine && !bMine) return -1;
-        if(!aMine && bMine) return 1;
-        return 0;
-    });
-    
-    return sorted.map(b=>{
-        const isMine = b.email===email;
-        const cls = isMine ? 'slot-seg mine-seg' : 'slot-seg booked-seg';
-        const text = b.client + (b.notes && b.notes.trim() ? ` · ${b.notes.trim()}` : '');
-        return `<div class="${cls}" title="${text}">${text}</div>`;
-    }).join('');
+// ── Групповой слот: 3 горизонтальных сегмента ────────────────────────────────
+function groupSlotHTML(horses, limit, isMine, myHorse, tipExtra){
+    const slots=limit||3;
+    const segs=[];
+    // Determine if my horse is in here
+    const myIdx = isMine ? horses.indexOf(myHorse) : -1;
+    for(let i=0;i<slots;i++){
+        const h=horses[i]||'';
+        const isMe = isMine && h && h===myHorse;
+        const cls = isMe ? 'seg-mine' : (h ? 'seg-filled' : 'seg-empty');
+        segs.push(`<div class="slot-seg ${cls}">${h||''}</div>`);
+    }
+    // Build tooltip
+    let tip = horses.filter(Boolean).map((h,i)=>{
+        const n=tipExtra&&tipExtra[i]?` — ${tipExtra[i]}`:'';
+        return h+n;
+    }).join('\n');
+    const tipAttr = tip ? ` data-tip="${tip.replace(/"/g,'&quot;')}"` : '';
+    return {html:`<div class="slot-segments">${segs.join('')}</div>`, tipAttr};
 }
 
 // ── Рендер календаря ─────────────────────────────────────────────────────────
@@ -399,9 +451,20 @@ function renderCal(){
             const st=cellSt(ds,time,email);
 
             if(st.type==='mine'){
-                const segs = renderSlotSegments([st.b], email, 'mine');
                 const tip=SVC[st.b.service]?.name||st.b.service;
-                body+=`<td><div class="slot mine" data-cancel="${st.b.id}" title="${tip}">${segs}</div></td>`; return;
+                const tipFull=(tip+(st.b.notes?' · '+st.b.notes:'')).replace(/"/g,'&quot;');
+                // For group services show segments
+                if(!SVC[st.b.service]?.indiv){
+                    // Get all bookings for this slot to show full segments
+                    const allInSlot=covering(ds,time);
+                    const othInSlot=allInSlot.filter(b=>b.email!==email);
+                    const lim=SVC[st.b.service]?.limit||3;
+                    const horses=[st.b.client,...othInSlot.map(b=>b.client)];
+                    const notes=[st.b.notes||'',...othInSlot.map(b=>b.notes||'')];
+                    const {html,tipAttr}=groupSlotHTML(horses,lim,true,st.b.client,notes);
+                    body+=`<td><div class="slot mine" data-cancel="${st.b.id}"${tipAttr?` data-tip="${(st.b.client+(st.b.notes?' · '+st.b.notes:'')).replace(/"/g,'&quot;')}"`:''} >${html}</div></td>`; return;
+                }
+                body+=`<td><div class="slot mine" data-cancel="${st.b.id}" data-tip="${tipFull}">✓</div></td>`; return;
             }
             if(st.type==='mine-ext'){
                 body+=`<td><div class="slot mine-ext">+</div></td>`; return;
@@ -409,34 +472,57 @@ function renderCal(){
 
             if(!selSvc){
                 if(st.type==='booked'){
-                    const segs = renderSlotSegments(st.bookings, email, 'booked');
-                    body+=`<td><div class="slot booked" data-view="${ds}|${time}">${segs}</div></td>`;
+                    const lim=st.limit||1;
+                    const horses=st.horses||[];
+                    // Group service booked → show segments
+                    if(lim>1 && horses.length>0){
+                        const {html,tipAttr}=groupSlotHTML(horses,lim,false,'',null);
+                        body+=`<td><div class="slot booked" data-view="${ds}|${time}"${tipAttr}>${html}</div></td>`;
+                    } else {
+                        body+=`<td><div class="slot booked" data-view="${ds}|${time}">✕</div></td>`;
+                    }
                 }
                 else if(st.type==='partial'){
-                    const segs = renderSlotSegments(st.bookings, email, 'partial');
-                    body+=`<td><div class="slot partial" data-view="${ds}|${time}">${segs}</div></td>`;
+                    const {html,tipAttr}=groupSlotHTML(st.horses||[],st.limit,false,'',st.notes);
+                    body+=`<td><div class="slot partial" data-view="${ds}|${time}"${tipAttr}>${html}</div></td>`;
                 }
                 else body+=`<td><div class="slot free"></div></td>`;
                 return;
             }
 
+            // Режим выбора
             const isSel=selectedSlots.some(s=>s.date===ds&&s.time===time);
             if(isSel){ body+=`<td><div class="slot selecting" data-sel="${ds}|${time}">✓</div></td>`; return; }
 
             if(st.type==='booked'){
-                const segs = renderSlotSegments(st.bookings, email, 'booked');
-                body+=`<td><div class="slot booked" data-view="${ds}|${time}">${segs}</div></td>`; return;
+                const lim=st.limit||1;
+                const horses=st.horses||[];
+                if(lim>1 && horses.length>0){
+                    const {html,tipAttr}=groupSlotHTML(horses,lim,false,'',null);
+                    body+=`<td><div class="slot booked" data-view="${ds}|${time}"${tipAttr}>${html}</div></td>`;
+                } else {
+                    body+=`<td><div class="slot booked" data-view="${ds}|${time}">✕</div></td>`;
+                }
+                return;
             }
             
             if(st.type==='unavail'){ body+=`<td><div class="slot unavail"></div></td>`; return; }
 
             const ok=canBook(ds,time,time,selSvc,email);
-            if(ok)                       body+=`<td><div class="slot avail" data-sel="${ds}|${time}"></div></td>`;
-            else if(st.type==='partial'){
-                const segs = renderSlotSegments(st.bookings, email, 'partial');
-                body+=`<td><div class="slot unavail" data-view="${ds}|${time}">${segs}</div></td>`;
+            if(ok){
+                // Show free segments if group service with partials
+                if(st.type==='partial'){
+                    const {html,tipAttr}=groupSlotHTML(st.horses||[],st.limit,false,'',st.notes);
+                    body+=`<td><div class="slot avail" data-sel="${ds}|${time}"${tipAttr}>${html}</div></td>`;
+                } else {
+                    body+=`<td><div class="slot avail" data-sel="${ds}|${time}"></div></td>`;
+                }
+            } else if(st.type==='partial'){
+                const {html,tipAttr}=groupSlotHTML(st.horses||[],st.limit,false,'',st.notes);
+                body+=`<td><div class="slot unavail" data-view="${ds}|${time}"${tipAttr}>${html}</div></td>`;
+            } else {
+                body+=`<td><div class="slot unavail"></div></td>`;
             }
-            else                         body+=`<td><div class="slot unavail"></div></td>`;
         });
         body+='</tr>';
     }
@@ -459,11 +545,13 @@ function handleSel(key){
 
     if(!email){ warnHint('Сначала введите email'); return; }
 
+    // Сброс если другой день
     if(selectedSlots.length && selectedSlots[0].date!==ds) selectedSlots=[];
 
     const svc=SVC[selSvc];
     const auto=svc.autoSlots||1;
 
+    // Снять галочку если уже выбран
     const idx=selectedSlots.findIndex(s=>s.date===ds&&s.time===time);
     if(idx>=0){
         selectedSlots=[];
@@ -472,16 +560,19 @@ function handleSel(key){
         renderCal(); return;
     }
 
+    // Проверка: нельзя выбирать соседний с уже выбранным (для 30-минутных)
     if(!isAdmin && selSvc!=='riding60' && selectedSlots.length>0){
         const newIdx = tidx(time);
         for(const sel of selectedSlots){
             const selIdx = tidx(sel.time);
+            // Если новый слот соседний с любым уже выбранным (до или после)
             if(Math.abs(newIdx - selIdx) === 1){
                 warnHint(`Нельзя бронировать два слота подряд.`); return;
             }
         }
     }
 
+    // Проверка соседних слотов для 30-минутных услуг (кроме riding60)
     if(!isAdmin && selSvc!=='riding60'){
         for(let i=0; i<auto; i++){
             const t=TIMES[tidx(time)+i];
@@ -491,6 +582,7 @@ function handleSel(key){
         }
     }
 
+    // Проверяем что все auto слотов доступны
     const fromIdx=tidx(time);
     for(let i=0;i<auto;i++){
         const t=TIMES[fromIdx+i];
@@ -498,6 +590,7 @@ function handleSel(key){
         if(!canBook(ds,t,t,selSvc,email)){ warnHint(`Слот ${t} недоступен.`); return; }
     }
 
+    // Добавляем все нужные слоты
     for(let i=0;i<auto;i++){
         const t=TIMES[fromIdx+i];
         if(!selectedSlots.some(s=>s.date===ds&&s.time===t)){
@@ -506,6 +599,7 @@ function handleSel(key){
     }
     selectedSlots.sort((a,b)=>tidx(a.time)-tidx(b.time));
 
+    // Проверяем непрерывность всего набора (для riding60)
     const contiguous=selectedSlots.every((s,i)=>i===0||tidx(s.time)===tidx(selectedSlots[i-1].time)+1);
     if(!contiguous){ warnHint('Слоты должны идти подряд.'); selectedSlots=[]; renderCal(); return; }
 
@@ -519,8 +613,10 @@ function showForm(){
     const tStart=selectedSlots[0].time;
     const tEnd  =selectedSlots[selectedSlots.length-1].time;
     const endDisp=TIMES[tidx(tEnd)+1]||tEnd;
+    const horse=getActiveHorse();
     document.getElementById('bookingSummary').innerHTML=
-        `<b>${svc.name}</b><br>${selectedSlots[0].date} · ${tStart} – ${endDisp} (${dur} мин)`;
+        `<b>${svc.name}</b><br>${selectedSlots[0].date} · ${tStart} – ${endDisp} (${dur} мин)`+
+        (horse?`<br>🐴 ${horse}`:'');
     document.getElementById('notes').value='';
     document.getElementById('formCard').style.display='block';
     hint(`Шаг 3 — подтвердите или добавьте ещё слот`);
@@ -529,7 +625,7 @@ function showForm(){
 // ── Бронирование ─────────────────────────────────────────────────────────────
 async function submitBooking(){
     const email=document.getElementById('userEmail').value.trim();
-    const horse=document.getElementById('userName').value.trim();
+    const horse=getActiveHorse();
     const notes=document.getElementById('notes').value.trim();
     if(!email||!horse){ warnHint('Введите email и кличку лошади'); return; }
     if(!selSvc||!selectedSlots.length){ warnHint('Выберите услугу и время'); return; }
@@ -581,6 +677,7 @@ function resetSel(){
     selectedSlots=[]; selSvc=null;
     document.getElementById('formCard').style.display='none';
     document.getElementById('commentsCard').style.display='none';
+    document.getElementById('horseSelectorWrap').style.display='none';
     hint('Шаг 1 — выберите услугу');
     renderSvc(); renderCal();
 }
@@ -685,6 +782,7 @@ document.getElementById('svcGrid').addEventListener('click',e=>{
     document.getElementById('formCard').style.display='none';
     const svc=SVC[selSvc];
     hint(`Шаг 2 — выберите слоты (${svc.name})`);
+    updateHorseSelector();
     renderSvc(); renderCal();
 });
 
@@ -695,6 +793,10 @@ document.getElementById('todayBtn').addEventListener('click',()=>{offset=0;rende
 document.getElementById('userEmail').addEventListener('input',()=>{renderCal();renderMyBookings();});
 document.getElementById('userEmail').addEventListener('change',()=>{saveUserData();renderCal();renderMyBookings();});
 document.getElementById('userName').addEventListener('change',()=>saveUserData());
+
+document.getElementById('horseSelector').addEventListener('change',()=>{
+    if(selectedSlots.length>0) showForm();
+});
 
 document.getElementById('submitBtn').addEventListener('click',submitBooking);
 document.getElementById('cancelSelBtn').addEventListener('click',resetSel);
