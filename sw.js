@@ -1,5 +1,5 @@
-// КСК Васькино — Service Worker v1.1
-const CACHE = 'vaskino-v1';
+// КСК Васькино — Service Worker v1.2
+const CACHE = 'vaskino-v2';
 const OFFLINE_ASSETS = [
   '/Vaskino/',
   '/Vaskino/index.html',
